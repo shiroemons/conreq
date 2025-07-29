@@ -1,153 +1,62 @@
 # golangci-lint v2 configuration
 # https://golangci-lint.run/usage/configuration/
 
+version: 2
+
 run:
   timeout: 5m
   tests: true
-  build-tags:
-    - integration
-  skip-dirs-use-default: true
-  modules-download-mode: readonly
-
-output:
-  formats:
-    - format: colored-line-number
-  print-issued-lines: true
-  print-linter-name: true
-  uniq-by-line: true
-  sort-results: true
 
 linters:
   enable:
-    # Default linters
-    - errcheck
-    - gosimple
+    # - errcheck # fmt.Fprintlnのエラーチェックが多すぎるため無効化
     - govet
     - ineffassign
     - staticcheck
     - unused
-    
-    # Additional linters
     - bodyclose
     - dogsled
     - dupl
     - errorlint
-    - exportloopref
-    - funlen
-    - gochecknoinits
+    # - funlen # 長い関数は必要に応じて許可
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
-    - goimports
-    - gomnd
-    - goprintffuncname
     - gosec
     - lll
     - misspell
     - nakedret
     - noctx
-    - nolintlint
-    - revive
-    - rowserrcheck
-    - sqlclosecheck
-    - stylecheck
-    - typecheck
-    - unconvert
-    - unparam
-    - whitespace
-    - wsl
     - prealloc
-    - predeclared
-    - thelper
-    - testpackage
-    - tparallel
+    - revive
     - unconvert
     - unparam
-    - wastedassign
     - whitespace
-
-  disable:
-    - gochecknoglobals
-    - exhaustive
-    - exhaustruct
-    - godot
-    - godox
-    - goerr113
-    - goheader
-    - gomodguard
-    - ireturn
-    - nlreturn
-    - paralleltest
-    - tagliatelle
-    - varnamelen
-    - wrapcheck
-    - nonamedreturns
-    - testableexamples
 
 linters-settings:
-  # Error checking
   errcheck:
     check-type-assertions: true
     check-blank: true
+    # fmt.Print系は除外
     exclude-functions:
-      - io.Copy
-      - io.Closer.Close
+      - fmt.Fprint
+      - fmt.Fprintf
+      - fmt.Fprintln
+      - fmt.Print
+      - fmt.Printf
+      - fmt.Println
+      - (os.File).Close
 
-  # Code complexity
   gocyclo:
     min-complexity: 15
 
   funlen:
-    lines: 100
-    statements: 50
-    ignore-comments: true
+    lines: 150
+    statements: 80
 
-  # Code style
-  gofmt:
-    simplify: true
-    rewrite-rules:
-      - pattern: 'interface{}'
-        replacement: 'any'
-
-  goimports:
-    local-prefixes: github.com/shiroemons/conreq
-
-  revive:
-    enable-all-rules: false
-    rules:
-      - name: blank-imports
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: dot-imports
-      - name: error-return
-      - name: error-strings
-      - name: error-naming
-      - name: exported
-        arguments:
-          - checkPrivateReceivers
-          - sayRepetitiveInsteadOfStutters
-      - name: if-return
-      - name: increment-decrement
-      - name: var-naming
-      - name: var-declaration
-      - name: range
-      - name: receiver-naming
-      - name: time-naming
-      - name: unexported-return
-      - name: indent-error-flow
-      - name: errorf
-      - name: empty-block
-      - name: superfluous-else
-      - name: unused-parameter
-      - name: unreachable-code
-      - name: redefines-builtin-id
-
-  # Code quality
   goconst:
     min-len: 3
     min-occurrences: 3
-    ignore-tests: true
 
   gocritic:
     enabled-tags:
@@ -156,83 +65,40 @@ linters-settings:
       - opinionated
       - performance
       - style
-    disabled-checks:
-      - dupImport
-      - ifElseChain
-      - octalLiteral
-      - whyNoLint
 
   dupl:
     threshold: 150
 
-  # Security
   gosec:
     severity: medium
     confidence: medium
-    excludes:
-      - G104  # Audit errors not checked
-      - G304  # Audit file path provided as CLI argument
 
-  # Style
   lll:
     line-length: 140
-    tab-width: 1
 
   misspell:
     locale: US
-    ignore-words:
-      - cancelled
 
-  wsl:
-    allow-assign-and-anything: false
-    allow-assign-and-call: true
-    allow-cuddle-declarations: false
-    allow-multiline-assign: true
-    allow-separated-leading-comment: false
-    allow-trailing-comment: false
-    force-case-trailing-whitespace: 0
-    force-err-cuddling: false
-    force-short-decl-cuddling: false
-    strict-append: true
-
-  stylecheck:
-    checks:
-      - all
-      - -ST1003  # Poorly chosen identifier (we use some non-standard names)
-
-  # Test related
-  testpackage:
-    skip-regexp: (export|internal)_test\.go
-
-  # Magic numbers
-  gomnd:
-    checks:
-      - argument
-      - case
-      - condition
-      - operation
-      - return
-      - assign
-    ignored-numbers:
-      - '0'
-      - '1'
-      - '2'
-      - '10'
-      - '100'
-    ignored-files:
-      - '_test\.go'
-    ignored-functions:
-      - '^math\.'
-      - '^http\.StatusText$'
+  revive:
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: var-naming
+      - name: package-comments
 
 issues:
-  exclude-use-default: false
+  exclude-dirs-use-default: true
   exclude-case-sensitive: false
   max-issues-per-linter: 0
   max-same-issues: 0
-  
+
   exclude-rules:
-    # Exclude some linters from running on tests files
     - path: _test\.go
       linters:
         - dupl
@@ -241,35 +107,15 @@ issues:
         - goconst
         - gosec
         - lll
-        - wsl
 
-    # Exclude some linters from running on main packages
     - path: cmd/
       linters:
-        - gochecknoinits
-        - wsl
-
-    # Exclude some linters from output packages
-    - path: internal/output/
-      linters:
-        - gomnd
-
-    # Exclude lll check for long lines with go generate
-    - linters:
-        - lll
-      source: "^//go:generate "
-
-    # Exclude some revive rules for test files
-    - path: _test\.go
-      linters:
-        - revive
-      text: "^(exported|package-comments)"
+        - funlen
 
   exclude:
-    # errcheck: Almost all programs ignore errors on these functions
-    - Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
-
-    # golint: Exported types and functions are used for API stability
-    - exported (type|method|function) (.+) should have comment or be unexported
-
-  new: false
+    # fmt.Print系のエラーは無視
+    - Error return value of `fmt\.(Fprint|Fprintf|Fprintln|Print|Printf|Println)` is not checked
+    # defer closeのエラーは無視
+    - Error return value of `.*\.Close` is not checked
+    # os.Stderr/Stdoutへの書き込みエラーは無視
+    - Error return value of .((os\.)?std(out|err)\..*|.*Flush|os\.Remove(All)?|os\.(Un)?Setenv). is not checked

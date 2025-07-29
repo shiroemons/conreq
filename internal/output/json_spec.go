@@ -13,15 +13,18 @@ import (
 	"github.com/shiroemons/conreq/internal/runner"
 )
 
+// SpecJSONFormatter formats results as JSON according to the specification.
 type SpecJSONFormatter struct {
 	writer io.Writer
 	config *config.Config
 }
 
+// NewSpecJSONFormatter creates a new spec JSON formatter.
 func NewSpecJSONFormatter(w io.Writer, cfg *config.Config) *SpecJSONFormatter {
 	return &SpecJSONFormatter{writer: w, config: cfg}
 }
 
+// SpecJSONMetadata represents metadata in the JSON output.
 type SpecJSONMetadata struct {
 	URL             string `json:"url"`
 	Method          string `json:"method"`
@@ -32,6 +35,7 @@ type SpecJSONMetadata struct {
 	TotalDurationMs int64  `json:"total_duration_ms"`
 }
 
+// SpecJSONRequest represents a request in the JSON output.
 type SpecJSONRequest struct {
 	Method  string            `json:"method"`
 	URL     string            `json:"url"`
@@ -39,6 +43,7 @@ type SpecJSONRequest struct {
 	Body    interface{}       `json:"body"`
 }
 
+// SpecJSONResponse represents a response in the JSON output.
 type SpecJSONResponse struct {
 	StatusCode int               `json:"status_code"`
 	StatusText string            `json:"status_text"`
@@ -46,6 +51,7 @@ type SpecJSONResponse struct {
 	Body       string            `json:"body"`
 }
 
+// SpecJSONResult represents a single result in the JSON output.
 type SpecJSONResult struct {
 	Index       int               `json:"index"`
 	RequestID   string            `json:"request_id"`
@@ -57,6 +63,7 @@ type SpecJSONResult struct {
 	Error       interface{}       `json:"error"`
 }
 
+// SpecJSONSummary represents the summary in the JSON output.
 type SpecJSONSummary struct {
 	Total             int            `json:"total"`
 	Successful        int            `json:"successful"`
@@ -68,12 +75,15 @@ type SpecJSONSummary struct {
 	StatusCodes       map[string]int `json:"status_codes"`
 }
 
+// SpecJSONOutput represents the complete JSON output structure.
 type SpecJSONOutput struct {
 	Metadata SpecJSONMetadata `json:"metadata"`
 	Results  []SpecJSONResult `json:"results"`
 	Summary  SpecJSONSummary  `json:"summary"`
 }
 
+// Format formats the result as JSON according to the specification.
+//nolint:funlen // 仕様に従った複雑な出力のため
 func (f *SpecJSONFormatter) Format(result *runner.Result) error {
 	output := SpecJSONOutput{
 		Metadata: SpecJSONMetadata{

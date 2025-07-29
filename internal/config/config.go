@@ -1,3 +1,4 @@
+// Package config provides configuration management for the conreq application.
 package config
 
 import (
@@ -7,6 +8,7 @@ import (
 	"time"
 )
 
+// Config holds all configuration parameters for concurrent requests.
 type Config struct {
 	URL             string
 	Method          string
@@ -22,6 +24,7 @@ type Config struct {
 	NoBody          bool
 }
 
+// NewConfig creates a new Config with default values.
 func NewConfig() *Config {
 	return &Config{
 		Method:          "GET",
@@ -35,6 +38,7 @@ func NewConfig() *Config {
 	}
 }
 
+// Validate checks if the configuration is valid.
 func (c *Config) Validate() error {
 	if c.URL == "" {
 		return fmt.Errorf("URLが指定されていません")
@@ -59,6 +63,7 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+// ParseHeaders parses header strings and adds them to the config.
 func (c *Config) ParseHeaders(headers []string) error {
 	for _, header := range headers {
 		parts := strings.SplitN(header, ":", 2)
@@ -91,6 +96,7 @@ func isValidHTTPMethod(method string) bool {
 	return false
 }
 
+// ParseDuration parses a duration string.
 func ParseDuration(s string) (time.Duration, error) {
 	if s == "" {
 		return 0, nil

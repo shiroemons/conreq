@@ -1,3 +1,4 @@
+// Package runner provides functionality for executing concurrent HTTP requests.
 package runner
 
 import (
@@ -10,6 +11,7 @@ import (
 	"github.com/shiroemons/conreq/pkg/requestid"
 )
 
+// Result represents the result of concurrent HTTP requests.
 type Result struct {
 	Responses []*client.Response
 	StartTime time.Time
@@ -17,11 +19,13 @@ type Result struct {
 	Config    *config.Config
 }
 
+// Runner executes concurrent HTTP requests.
 type Runner struct {
 	config *config.Config
 	client *client.Client
 }
 
+// NewRunner creates a new Runner.
 func NewRunner(cfg *config.Config) *Runner {
 	return &Runner{
 		config: cfg,
@@ -29,6 +33,7 @@ func NewRunner(cfg *config.Config) *Runner {
 	}
 }
 
+// Run executes concurrent HTTP requests.
 func (r *Runner) Run(ctx context.Context) (*Result, error) {
 	result := &Result{
 		StartTime: time.Now(),
@@ -87,6 +92,7 @@ func (r *Runner) Run(ctx context.Context) (*Result, error) {
 	return result, nil
 }
 
+// HasErrors returns true if any response has an error.
 func (r *Result) HasErrors() bool {
 	for _, resp := range r.Responses {
 		if resp.Error != nil {
@@ -96,6 +102,7 @@ func (r *Result) HasErrors() bool {
 	return false
 }
 
+// ErrorCount returns the number of failed requests.
 func (r *Result) ErrorCount() int {
 	count := 0
 	for _, resp := range r.Responses {
@@ -106,6 +113,7 @@ func (r *Result) ErrorCount() int {
 	return count
 }
 
+// SuccessCount returns the number of successful requests.
 func (r *Result) SuccessCount() int {
 	count := 0
 	for _, resp := range r.Responses {
@@ -116,6 +124,7 @@ func (r *Result) SuccessCount() int {
 	return count
 }
 
+// AverageDuration returns the average duration of successful requests.
 func (r *Result) AverageDuration() time.Duration {
 	if len(r.Responses) == 0 {
 		return 0

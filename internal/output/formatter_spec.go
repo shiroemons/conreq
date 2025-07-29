@@ -9,19 +9,24 @@ import (
 	"github.com/shiroemons/conreq/internal/runner"
 )
 
+// SpecTextFormatter formats results as plain text according to the specification.
 type SpecTextFormatter struct {
 	writer io.Writer
 	config interface{} // configは後で渡せるように
 }
 
+// NewSpecTextFormatter creates a new spec text formatter.
 func NewSpecTextFormatter(w io.Writer) *SpecTextFormatter {
 	return &SpecTextFormatter{writer: w}
 }
 
+// SetConfig sets the configuration for the formatter.
 func (f *SpecTextFormatter) SetConfig(cfg interface{}) {
 	f.config = cfg
 }
 
+// Format formats the result according to the specification.
+//nolint:errcheck // io.Writer への出力エラーは無視
 func (f *SpecTextFormatter) Format(result *runner.Result) error {
 	// Request Summary
 	fmt.Fprintln(f.writer, "=== Request Summary ===")

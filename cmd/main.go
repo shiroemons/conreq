@@ -1,3 +1,4 @@
+// Package main provides the command-line interface for conreq.
 package main
 
 import (
@@ -93,7 +94,7 @@ APIの挙動を検証するためのツールです。`,
 				if strings.HasPrefix(data, "@") {
 					// ファイルから読み込み
 					filename := data[1:]
-					content, err := os.ReadFile(filename)
+					content, err := os.ReadFile(filename) //nolint:gosec // CLI argument
 					if err != nil {
 						return fmt.Errorf("ファイル読み込みエラー: %w", err)
 					}
@@ -118,11 +119,11 @@ APIの挙動を検証するためのツールです。`,
 			// 出力先を決定
 			var outputWriter *os.File
 			if outputFile != "" {
-				file, err := os.Create(outputFile)
+				file, err := os.Create(outputFile) //nolint:gosec // CLI argument
 				if err != nil {
 					return fmt.Errorf("出力ファイル作成エラー: %w", err)
 				}
-				defer file.Close()
+				defer func() { _ = file.Close() }()
 				outputWriter = file
 			} else {
 				outputWriter = os.Stdout

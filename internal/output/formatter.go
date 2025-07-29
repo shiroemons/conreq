@@ -1,3 +1,4 @@
+// Package output provides formatters for displaying request results.
 package output
 
 import (
@@ -11,18 +12,23 @@ import (
 	"github.com/shiroemons/conreq/internal/runner"
 )
 
+// Formatter is the interface for result formatters.
 type Formatter interface {
 	Format(result *runner.Result) error
 }
 
+// TextFormatter formats results as plain text.
 type TextFormatter struct {
 	writer io.Writer
 }
 
+// NewTextFormatter creates a new text formatter.
 func NewTextFormatter(w io.Writer) *TextFormatter {
 	return &TextFormatter{writer: w}
 }
 
+// Format formats the result as plain text.
+//nolint:errcheck // io.Writer への出力エラーは無視
 func (f *TextFormatter) Format(result *runner.Result) error {
 	fmt.Fprintln(f.writer, "=== 実行結果 ===")
 	fmt.Fprintf(f.writer, "開始時刻: %s\n", result.StartTime.Format(time.RFC3339))

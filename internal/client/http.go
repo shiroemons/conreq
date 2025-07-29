@@ -1,3 +1,4 @@
+// Package client provides HTTP client functionality for making concurrent requests.
 package client
 
 import (
@@ -11,6 +12,7 @@ import (
 	"github.com/shiroemons/conreq/internal/config"
 )
 
+// Response represents an HTTP response with metadata.
 type Response struct {
 	RequestID    string
 	StatusCode   int
@@ -23,16 +25,18 @@ type Response struct {
 	StatusText   string
 }
 
+// Client is an HTTP client for making concurrent requests.
 type Client struct {
 	httpClient *http.Client
 	config     *config.Config
 }
 
+// NewClient creates a new HTTP client.
 func NewClient(cfg *config.Config) *Client {
 	return &Client{
 		httpClient: &http.Client{
 			Timeout: cfg.Timeout,
-			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
 				return http.ErrUseLastResponse
 			},
 		},
@@ -40,6 +44,7 @@ func NewClient(cfg *config.Config) *Client {
 	}
 }
 
+// Do executes an HTTP request.
 func (c *Client) Do(ctx context.Context, requestIndex int) *Response {
 	start := time.Now()
 	response := &Response{
@@ -61,7 +66,7 @@ func (c *Client) Do(ctx context.Context, requestIndex int) *Response {
 		response.Duration = time.Since(start)
 		return response
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	response.StatusCode = resp.StatusCode
 	response.StatusText = http.StatusText(resp.StatusCode)
@@ -108,6 +113,7 @@ func (c *Client) createRequest(ctx context.Context) (*http.Request, error) {
 	return req, nil
 }
 
+// DoWithDelay executes an HTTP request with a delay.
 func (c *Client) DoWithDelay(ctx context.Context, requestIndex int, delay time.Duration) *Response {
 	if delay > 0 {
 		timer := time.NewTimer(delay)

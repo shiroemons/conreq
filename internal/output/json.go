@@ -8,14 +8,17 @@ import (
 	"github.com/shiroemons/conreq/internal/runner"
 )
 
+// JSONFormatter formats results as JSON.
 type JSONFormatter struct {
 	writer io.Writer
 }
 
+// NewJSONFormatter creates a new JSON formatter.
 func NewJSONFormatter(w io.Writer) *JSONFormatter {
 	return &JSONFormatter{writer: w}
 }
 
+// JSONResponse represents a single HTTP response in JSON format.
 type JSONResponse struct {
 	RequestID    string            `json:"request_id"`
 	StatusCode   int               `json:"status_code,omitempty"`
@@ -27,6 +30,7 @@ type JSONResponse struct {
 	Error        string            `json:"error,omitempty"`
 }
 
+// JSONResult represents the overall result in JSON format.
 type JSONResult struct {
 	StartTime    string         `json:"start_time"`
 	EndTime      string         `json:"end_time"`
@@ -38,6 +42,7 @@ type JSONResult struct {
 	Responses    []JSONResponse `json:"responses"`
 }
 
+// Format formats the result as JSON.
 func (f *JSONFormatter) Format(result *runner.Result) error {
 	jsonResult := JSONResult{
 		StartTime:    result.StartTime.Format(time.RFC3339),
