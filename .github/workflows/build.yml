@@ -33,8 +33,13 @@ jobs:
       run: go mod download
 
     - name: Build
+      shell: bash
       run: |
-        BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          BUILD_DATE=$(powershell -Command "Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ'")
+        else
+          BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+        fi
         go build -v -ldflags="-s -w -X main.version=${{ github.sha }} -X main.date=${BUILD_DATE}" -o ${{ matrix.output }} cmd/conreq/main.go
 
     - name: Test binary
