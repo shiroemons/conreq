@@ -21,10 +21,7 @@ type ProgressFormatter struct {
 // NewProgressFormatter creates a new progress formatter.
 func NewProgressFormatter(w io.Writer, totalCount int) *ProgressFormatter {
 	// Calculate the width needed for request index display
-	requestWidth := len(fmt.Sprintf("%d", totalCount-1))
-	if requestWidth < 7 { // minimum width for "Request"
-		requestWidth = 7
-	}
+	requestWidth := max(len(fmt.Sprintf("%d", totalCount)), 7) // minimum width for "Request"
 
 	return &ProgressFormatter{
 		writer:       w,
@@ -44,21 +41,19 @@ func (f *ProgressFormatter) Start() {
 // FormatProgress formats a single progress update.
 func (f *ProgressFormatter) FormatProgress(p *runner.Progress) {
 	elapsed := time.Since(f.startTime)
-	timeStr := time.Now().Format("15:04:05.000")
-	requestStr := fmt.Sprintf("Request %*d", f.requestWidth-7, p.Index)
+	timeStr := time.Now().Format("15:04:05.000000")
+	requestStr := fmt.Sprintf("Request %*d", f.requestWidth-7, p.Index+1)
 
-	var statusIcon, statusText, httpCode, duration string
+	var statusIcon, statusText, httpCode string
 	switch p.Status {
 	case "pending":
 		statusIcon = "⏳"
 		statusText = "PENDING"
 		httpCode = "-"
-		duration = "-"
 	case "running":
 		statusIcon = "🔄"
 		statusText = "RUNNING"
 		httpCode = "-"
-		duration = "-"
 	case "completed":
 		statusIcon = "✅"
 		if p.StatusCode >= 400 {
@@ -69,25 +64,22 @@ func (f *ProgressFormatter) FormatProgress(p *runner.Progress) {
 		}
 		statusText = "DONE"
 		httpCode = fmt.Sprintf("%d", p.StatusCode)
-		duration = formatDuration(p.EndTime.Sub(p.StartTime))
 	case "failed":
 		statusIcon = "❌"
 		statusText = "FAILED"
 		httpCode = "-"
-		duration = "-"
 		if p.Error != nil {
 			statusText = fmt.Sprintf("FAILED: %s", p.Error.Error())
 		}
 	}
 
-	_, _ = fmt.Fprintf(f.writer, "[%8s] %s | %-*s  %s %-7s  %4s  %9s  %s\n",
+	_, _ = fmt.Fprintf(f.writer, "[%8s] %-18s | %-*s  %s  %-8s %4s  %s\n",
 		formatDuration(elapsed),
 		timeStr,
 		f.requestWidth, requestStr,
 		statusIcon,
 		statusText,
 		httpCode,
-		duration,
 		p.RequestID,
 	)
 }
@@ -97,13 +89,13 @@ func (f *ProgressFormatter) Finish() {
 	elapsed := time.Since(f.startTime)
 	now := time.Now().Format("2006-01-02 15:04:05")
 	_, _ = fmt.Fprintf(f.writer, "\n🎉 All requests completed in %s at %s\n", formatDuration(elapsed), now)
-	_, _ = fmt.Fprintln(f.writer, strings.Repeat("=", 110))
+	_, _ = fmt.Fprintln(f.writer, strings.Repeat("=", 109))
 }
 
 func (f *ProgressFormatter) printHeader() {
-	_, _ = fmt.Fprintf(f.writer, "%-10s %-12s | %-*s  %s %-7s  %4s  %9s  %s\n",
-		"+Time", "Time", f.requestWidth, "Request", " ", "Status", "Code", "Duration", "Request-ID")
-	_, _ = fmt.Fprintln(f.writer, strings.Repeat("─", 110))
+	_, _ = fmt.Fprintf(f.writer, "%-10s %-18s | %-*s    %-10s   %4s  %s\n",
+		"Duration", "Time", f.requestWidth, "Request", "Status", "Code", "Request-ID")
+	_, _ = fmt.Fprintln(f.writer, strings.Repeat("─", 109))
 }
 
 func formatDuration(d time.Duration) string {

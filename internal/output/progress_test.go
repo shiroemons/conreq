@@ -25,7 +25,7 @@ func TestProgressFormatter(t *testing.T) {
 				Status:    "pending",
 				StartTime: time.Now(),
 			},
-			wantOutput: []string{"Request 0", "⏳", "PENDING", "test-id-123"},
+			wantOutput: []string{"Request 1", "⏳", "PENDING", "test-id-123"},
 		},
 		{
 			name:       "running status",
@@ -36,7 +36,7 @@ func TestProgressFormatter(t *testing.T) {
 				Status:    "running",
 				StartTime: time.Now(),
 			},
-			wantOutput: []string{"Request 2", "🔄", "RUNNING", "test-id-456"},
+			wantOutput: []string{"Request 3", "🔄", "RUNNING", "test-id-456"},
 		},
 		{
 			name:       "completed status",
@@ -49,7 +49,7 @@ func TestProgressFormatter(t *testing.T) {
 				StartTime:  time.Now(),
 				EndTime:    time.Now().Add(1500 * time.Millisecond),
 			},
-			wantOutput: []string{"Request 1", "✅", "DONE", "200", "test-id-789"},
+			wantOutput: []string{"Request 2", "✅", "DONE", "200", "test-id-789"},
 		},
 		{
 			name:       "failed status",
@@ -61,7 +61,7 @@ func TestProgressFormatter(t *testing.T) {
 				Error:     &testError{msg: "connection timeout"},
 				StartTime: time.Now(),
 			},
-			wantOutput: []string{"Request 0", "❌", "FAILED", "connection timeout", "test-id-error"},
+			wantOutput: []string{"Request 1", "❌", "FAILED", "connection timeout", "test-id-error"},
 		},
 	}
 
