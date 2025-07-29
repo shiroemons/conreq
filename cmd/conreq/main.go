@@ -65,6 +65,7 @@ func newRootCmd() *cobra.Command {
 		outputJSON      bool
 		outputFile      string
 		showVersion     bool
+		streamOutput    bool
 	)
 
 	cmd := &cobra.Command{
@@ -143,6 +144,39 @@ APIの挙動を検証するためのツールです。`,
 
 			// リクエストを実行
 			r := runner.NewRunner(cfg)
+
+			// ストリーミング出力の設定（--streamフラグが有効で、JSON出力でない場合のみ）
+			if streamOutput && !cfg.OutputJSON && outputFile == "" {
+				progressFormatter := output.NewProgressFormatter(os.Stderr, cfg.Count)
+				progressFormatter.Start()
+
+				// プログレスチャネルを別goroutineで監視
+				progressDone := make(chan struct{})
+				go func() {
+					for progress := range r.ProgressChannel() {
+						progressFormatter.FormatProgress(progress)
+					}
+					progressFormatter.Finish()
+					close(progressDone)
+				}()
+
+				// リクエストを実行
+				result, err := r.Run(context.Background())
+				if err != nil {
+					return err
+				}
+
+				// プログレス出力の完了を待つ
+				<-progressDone
+
+				// 結果を標準出力に出力
+				_, _ = fmt.Fprintln(os.Stdout, "\nFinal Results:")
+				_, _ = fmt.Fprintln(os.Stdout, "")
+				formatter := output.NewSpecTextFormatter(os.Stdout)
+				return formatter.Format(result)
+			}
+
+			// JSON出力またはファイル出力の場合は従来通り
 			result, err := r.Run(context.Background())
 			if err != nil {
 				return err
@@ -186,6 +220,7 @@ APIの挙動を検証するためのツールです。`,
 	cmd.Flags().BoolVar(&outputJSON, "json", false, "JSON形式で出力")
 	cmd.Flags().StringVarP(&outputFile, "output", "o", "", "結果をファイルに出力")
 	cmd.Flags().BoolVarP(&showVersion, "version", "v", false, "バージョン情報を表示")
+	cmd.Flags().BoolVar(&streamOutput, "stream", false, "リアルタイムで進行状況を表示")
 
 	return cmd
 }

@@ -20,6 +20,7 @@ conreqは、同一のAPIエンドポイントに対して複数の並行HTTPリ�
 - テキストまたはJSON形式での結果出力
 - ファイルからのリクエストボディ読み込み（@記法対応）
 - 全HTTPメソッドのサポート（GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS）
+- リアルタイムでの進行状況表示（--streamオプション）
 
 ## インストール
 
@@ -75,6 +76,9 @@ conreq https://httpbin.org/get
 # 3つの並行GETリクエスト
 conreq https://httpbin.org/get -c 3
 
+# リアルタイムで進行状況を表示しながら実行
+conreq https://httpbin.org/delay/1 -c 5 --stream
+
 # POSTリクエストでJSONボディを送信
 conreq https://httpbin.org/post -X POST -d '{"key": "value"}' -H "Content-Type: application/json"
 
@@ -112,11 +116,45 @@ conreq https://httpbin.org/status/500 -c 3
 | `--timeout` | | タイムアウト時間 | 30s |
 | `--no-body` | | レスポンスボディを非表示（JSON出力時は無視） | false |
 | `--json` | | JSON形式で出力 | false |
+| `--stream` | | リアルタイムで進行状況を表示 | false |
 | `--output` | `-o` | 結果をファイルに出力 | 標準出力 |
 | `--version` | `-v` | バージョン情報を表示 | - |
 | `--help` | `-h` | ヘルプを表示 | - |
 
 ### 出力例
+
+#### ストリーミング出力（--stream）
+
+```
+🚀 Starting 3 concurrent requests at 2025-07-29 17:38:58
+
++Time      Time         | Request    Status   Code   Duration  Request-ID
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[   258µs] 17:38:58.238 | Request 0  ⏳ PENDING     -          -  1baa21bf-589e-4188-a805-96213490eb14
+[   278µs] 17:38:58.238 | Request 1  ⏳ PENDING     -          -  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
+[   280µs] 17:38:58.238 | Request 0  🔄 RUNNING     -          -  1baa21bf-589e-4188-a805-96213490eb14
+[   281µs] 17:38:58.238 | Request 2  ⏳ PENDING     -          -  f4961313-64cd-433b-9fca-2ab23bf4bb5a
+[   283µs] 17:38:58.238 | Request 1  🔄 RUNNING     -          -  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
+[   283µs] 17:38:58.238 | Request 2  🔄 RUNNING     -          -  f4961313-64cd-433b-9fca-2ab23bf4bb5a
+[   1.77s] 17:39:00.009 | Request 2  ✅ DONE      200      1.77s  f4961313-64cd-433b-9fca-2ab23bf4bb5a
+[   1.80s] 17:39:00.037 | Request 0  ✅ DONE      200      1.80s  1baa21bf-589e-4188-a805-96213490eb14
+[   2.03s] 17:39:00.264 | Request 1  ✅ DONE      200      2.03s  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
+
+🎉 All requests completed in 2.03s at 2025-07-29 17:39:00
+==============================================================================================================
+
+Final Results:
+
+[... 続けて通常の結果出力 ...]
+```
+
+**ストリーミング出力の絵文字説明：**
+- ⏳ PENDING: リクエスト待機中
+- 🔄 RUNNING: リクエスト実行中
+- ✅ DONE (2xx): 成功レスポンス
+- ⚠️ DONE (4xx): クライアントエラー
+- ❌ DONE (5xx): サーバーエラー
+- ❌ FAILED: ネットワークエラーなど
 
 #### テキスト形式（デフォルト）
 
@@ -204,8 +242,8 @@ Average Response Time: 122ms
 ### API負荷テスト
 
 ```bash
-# 5つの並行リクエストで負荷をかける
-conreq https://httpbin.org/delay/1 -c 5 --timeout 60s
+# 5つの並行リクエストで負荷をかける（進行状況を表示）
+conreq https://httpbin.org/delay/1 -c 5 --timeout 60s --stream
 
 # 大きなレスポンスを並行取得
 conreq https://httpbin.org/bytes/10240 -c 3

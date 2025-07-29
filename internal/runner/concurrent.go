@@ -11,6 +11,17 @@ import (
 	"github.com/shiroemons/conreq/pkg/requestid"
 )
 
+// Progress represents the progress of a single request.
+type Progress struct {
+	Index      int
+	RequestID  string
+	Status     string // "pending", "running", "completed", "failed"
+	StatusCode int
+	Error      error
+	StartTime  time.Time
+	EndTime    time.Time
+}
+
 // Result represents the result of concurrent HTTP requests.
 type Result struct {
 	Responses []*client.Response
@@ -21,16 +32,23 @@ type Result struct {
 
 // Runner executes concurrent HTTP requests.
 type Runner struct {
-	config *config.Config
-	client *client.Client
+	config       *config.Config
+	client       *client.Client
+	progressChan chan *Progress
 }
 
 // NewRunner creates a new Runner.
 func NewRunner(cfg *config.Config) *Runner {
 	return &Runner{
-		config: cfg,
-		client: client.NewClient(cfg),
+		config:       cfg,
+		client:       client.NewClient(cfg),
+		progressChan: make(chan *Progress, cfg.Count*3), // buffer for pending, running, completed
 	}
+}
+
+// ProgressChannel returns the progress channel for streaming updates.
+func (r *Runner) ProgressChannel() <-chan *Progress {
+	return r.progressChan
 }
 
 // Run executes concurrent HTTP requests.
@@ -70,10 +88,47 @@ func (r *Runner) Run(ctx context.Context) (*Result, error) {
 				}
 			}
 
+			// Send pending status
+			r.progressChan <- &Progress{
+				Index:     index,
+				RequestID: cfg.RequestID,
+				Status:    "pending",
+				StartTime: time.Now(),
+			}
+
 			client := client.NewClient(&cfg)
 
 			delay := time.Duration(index) * r.config.Delay
-			response := client.DoWithDelay(ctx, index, delay)
+			if delay > 0 {
+				time.Sleep(delay)
+			}
+
+			// Send running status
+			startTime := time.Now()
+			r.progressChan <- &Progress{
+				Index:     index,
+				RequestID: cfg.RequestID,
+				Status:    "running",
+				StartTime: startTime,
+			}
+
+			response := client.Do(ctx, index)
+
+			// Send completed/failed status
+			endTime := time.Now()
+			status := "completed"
+			if response.Error != nil {
+				status = "failed"
+			}
+			r.progressChan <- &Progress{
+				Index:      index,
+				RequestID:  cfg.RequestID,
+				Status:     status,
+				StatusCode: response.StatusCode,
+				Error:      response.Error,
+				StartTime:  startTime,
+				EndTime:    endTime,
+			}
 
 			responseChan <- response
 		}(i)
@@ -82,6 +137,7 @@ func (r *Runner) Run(ctx context.Context) (*Result, error) {
 	go func() {
 		wg.Wait()
 		close(responseChan)
+		close(r.progressChan)
 	}()
 
 	for response := range responseChan {
