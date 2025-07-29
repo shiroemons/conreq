@@ -1,85 +1,120 @@
+# golangci-lint v2 configuration
+# https://golangci-lint.run/usage/configuration/
+
 run:
   timeout: 5m
-  go: '1.24'
+  tests: true
   build-tags:
     - integration
+  skip-dirs-use-default: true
+  modules-download-mode: readonly
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+  uniq-by-line: true
+  sort-results: true
 
 linters:
   enable:
-    - gofmt
-    - goimports
+    # Default linters
+    - errcheck
+    - gosimple
     - govet
     - ineffassign
-    - misspell
-    - unconvert
-    - prealloc
-    - nakedret
-    - gocyclo
-    - gosec
-    - revive
-    - errorlint
     - staticcheck
-    - gosimple
     - unused
-    - typecheck
+    
+    # Additional linters
     - bodyclose
+    - dogsled
+    - dupl
+    - errorlint
+    - exportloopref
+    - funlen
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - gomnd
+    - goprintffuncname
+    - gosec
+    - lll
+    - misspell
+    - nakedret
     - noctx
+    - nolintlint
+    - revive
     - rowserrcheck
     - sqlclosecheck
-    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - whitespace
+    - wsl
+    - prealloc
+    - predeclared
+    - thelper
+    - testpackage
     - tparallel
+    - unconvert
     - unparam
     - wastedassign
     - whitespace
-    - wsl
+
+  disable:
+    - gochecknoglobals
+    - exhaustive
+    - exhaustruct
     - godot
     - godox
     - goerr113
-    - gomnd
-    - gomodguard
-    - goprintffuncname
-    - lll
-    - makezero
-    - nestif
-    - nilerr
-    - nolintlint
-    - predeclared
-    - promlinter
-    - testpackage
-    - thelper
-
-  disable:
-    - exhaustive
-    - gochecknoglobals
-    - gochecknoinits
-    - goconst
-    - gocognit
-    - cyclop
-    - dupl
-    - funlen
-    - gocyclo
-    - depguard
-    - dogsled
-    - errcheck
-    - forbidigo
-    - forcetypeassert
-    - gci
-    - gofumpt
     - goheader
-    - ifshort
-    - importas
-    - maintidx
-    - maligned
+    - gomodguard
+    - ireturn
     - nlreturn
     - paralleltest
-    - scopelint
     - tagliatelle
     - varnamelen
     - wrapcheck
-    - exhaustruct
+    - nonamedreturns
+    - testableexamples
 
 linters-settings:
+  # Error checking
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+    exclude-functions:
+      - io.Copy
+      - io.Closer.Close
+
+  # Code complexity
+  gocyclo:
+    min-complexity: 15
+
+  funlen:
+    lines: 100
+    statements: 50
+    ignore-comments: true
+
+  # Code style
+  gofmt:
+    simplify: true
+    rewrite-rules:
+      - pattern: 'interface{}'
+        replacement: 'any'
+
+  goimports:
+    local-prefixes: github.com/shiroemons/conreq
+
   revive:
+    enable-all-rules: false
     rules:
       - name: blank-imports
       - name: context-as-argument
@@ -89,11 +124,13 @@ linters-settings:
       - name: error-strings
       - name: error-naming
       - name: exported
+        arguments:
+          - checkPrivateReceivers
+          - sayRepetitiveInsteadOfStutters
       - name: if-return
       - name: increment-decrement
       - name: var-naming
       - name: var-declaration
-      - name: package-comments
       - name: range
       - name: receiver-naming
       - name: time-naming
@@ -106,92 +143,133 @@ linters-settings:
       - name: unreachable-code
       - name: redefines-builtin-id
 
-  goimports:
-    local-prefixes: github.com/shiroemons/conreq
-
-  gocyclo:
-    min-complexity: 15
-
-  maligned:
-    suggest-new: true
-
-  dupl:
-    threshold: 100
-
+  # Code quality
   goconst:
     min-len: 3
     min-occurrences: 3
+    ignore-tests: true
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - dupImport
+      - ifElseChain
+      - octalLiteral
+      - whyNoLint
+
+  dupl:
+    threshold: 150
+
+  # Security
+  gosec:
+    severity: medium
+    confidence: medium
+    excludes:
+      - G104  # Audit errors not checked
+      - G304  # Audit file path provided as CLI argument
+
+  # Style
+  lll:
+    line-length: 140
+    tab-width: 1
 
   misspell:
     locale: US
+    ignore-words:
+      - cancelled
 
-  lll:
-    line-length: 140
+  wsl:
+    allow-assign-and-anything: false
+    allow-assign-and-call: true
+    allow-cuddle-declarations: false
+    allow-multiline-assign: true
+    allow-separated-leading-comment: false
+    allow-trailing-comment: false
+    force-case-trailing-whitespace: 0
+    force-err-cuddling: false
+    force-short-decl-cuddling: false
+    strict-append: true
 
+  stylecheck:
+    checks:
+      - all
+      - -ST1003  # Poorly chosen identifier (we use some non-standard names)
+
+  # Test related
+  testpackage:
+    skip-regexp: (export|internal)_test\.go
+
+  # Magic numbers
   gomnd:
-    settings:
-      mnd:
-        checks:
-          - argument
-          - case
-          - condition
-          - return
-
-  gomodguard:
-    allowed:
-      modules:
-        - github.com/spf13/cobra
-        - github.com/google/uuid
-      domains: []
-    blocked:
-      modules: []
-      versions: []
-
-  errorlint:
-    errorf: true
-
-  godot:
-    scope: all
-    exclude:
-      - "^fixme:"
-      - "^todo:"
-    capital: true
-
-  nestif:
-    min-complexity: 6
+    checks:
+      - argument
+      - case
+      - condition
+      - operation
+      - return
+      - assign
+    ignored-numbers:
+      - '0'
+      - '1'
+      - '2'
+      - '10'
+      - '100'
+    ignored-files:
+      - '_test\.go'
+    ignored-functions:
+      - '^math\.'
+      - '^http\.StatusText$'
 
 issues:
+  exclude-use-default: false
+  exclude-case-sensitive: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  
   exclude-rules:
+    # Exclude some linters from running on tests files
     - path: _test\.go
       linters:
-        - gocyclo
-        - errcheck
         - dupl
+        - errcheck
+        - funlen
+        - goconst
         - gosec
-        - gomnd
-        - unparam
         - lll
-        - goerr113
         - wsl
-        - noctx
-        - testpackage
-        - govet
 
+    # Exclude some linters from running on main packages
     - path: cmd/
       linters:
-        - gochecknoglobals
-        - gomnd
-        - goerr113
+        - gochecknoinits
         - wsl
 
+    # Exclude some linters from output packages
     - path: internal/output/
       linters:
         - gomnd
 
+    # Exclude lll check for long lines with go generate
     - linters:
         - lll
       source: "^//go:generate "
 
-  exclude-use-default: false
-  max-issues-per-linter: 0
-  max-same-issues: 0
+    # Exclude some revive rules for test files
+    - path: _test\.go
+      linters:
+        - revive
+      text: "^(exported|package-comments)"
+
+  exclude:
+    # errcheck: Almost all programs ignore errors on these functions
+    - Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
+
+    # golint: Exported types and functions are used for API stability
+    - exported (type|method|function) (.+) should have comment or be unexported
+
+  new: false
