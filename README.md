@@ -126,22 +126,22 @@ conreq https://httpbin.org/status/500 -c 3
 #### ストリーミング出力（--stream）
 
 ```
-🚀 Starting 3 concurrent requests at 2025-07-29 17:38:58
+🚀 Starting 3 concurrent requests at 2025-07-30 00:45:12
 
-+Time      Time         | Request    Status   Code   Duration  Request-ID
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[   258µs] 17:38:58.238 | Request 0  ⏳ PENDING     -          -  1baa21bf-589e-4188-a805-96213490eb14
-[   278µs] 17:38:58.238 | Request 1  ⏳ PENDING     -          -  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
-[   280µs] 17:38:58.238 | Request 0  🔄 RUNNING     -          -  1baa21bf-589e-4188-a805-96213490eb14
-[   281µs] 17:38:58.238 | Request 2  ⏳ PENDING     -          -  f4961313-64cd-433b-9fca-2ab23bf4bb5a
-[   283µs] 17:38:58.238 | Request 1  🔄 RUNNING     -          -  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
-[   283µs] 17:38:58.238 | Request 2  🔄 RUNNING     -          -  f4961313-64cd-433b-9fca-2ab23bf4bb5a
-[   1.77s] 17:39:00.009 | Request 2  ✅ DONE      200      1.77s  f4961313-64cd-433b-9fca-2ab23bf4bb5a
-[   1.80s] 17:39:00.037 | Request 0  ✅ DONE      200      1.80s  1baa21bf-589e-4188-a805-96213490eb14
-[   2.03s] 17:39:00.264 | Request 1  ✅ DONE      200      2.03s  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
+Duration   Time               | Request    Status       Code  Request-ID
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[   145µs] 00:45:12.238456    | Request 1  ⏳  PENDING     -  1baa21bf-589e-4188-a805-96213490eb14
+[   172µs] 00:45:12.238483    | Request 1  🔄  RUNNING     -  1baa21bf-589e-4188-a805-96213490eb14
+[   174µs] 00:45:12.238485    | Request 2  ⏳  PENDING     -  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
+[   176µs] 00:45:12.238487    | Request 2  🔄  RUNNING     -  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
+[   178µs] 00:45:12.238489    | Request 3  ⏳  PENDING     -  f4961313-64cd-433b-9fca-2ab23bf4bb5a
+[   180µs] 00:45:12.238491    | Request 3  🔄  RUNNING     -  f4961313-64cd-433b-9fca-2ab23bf4bb5a
+[   1.45s] 00:45:13.690123    | Request 1  ✅  DONE      200  1baa21bf-589e-4188-a805-96213490eb14
+[   1.77s] 00:45:14.009001    | Request 3  ✅  DONE      200  f4961313-64cd-433b-9fca-2ab23bf4bb5a
+[   2.03s] 00:45:14.264832    | Request 2  ❌  DONE      500  0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
 
-🎉 All requests completed in 2.03s at 2025-07-29 17:39:00
-==============================================================================================================
+🎉 All requests completed in 2.03s at 2025-07-30 00:45:14
+=============================================================================================================
 
 Final Results:
 
@@ -166,19 +166,22 @@ Concurrent: 3
 Total Requests: 3
 
 === Results ===
-[1] 2024-01-20 15:30:45.123456 | Status: 200 | Time: 145ms | X-Request-ID: 550e8400-e29b-41d4-a716-446655440001
+[1] 2025-07-30 00:45:12.238456 | Status: 200 | Time: 1452ms | X-Request-ID: 1baa21bf-589e-4188-a805-96213490eb14
 {"status": "ok", "data": {...}}
 
-[2] 2024-01-20 15:30:45.234567 | Status: 200 | Time: 132ms | X-Request-ID: 550e8400-e29b-41d4-a716-446655440002
-{"status": "ok", "data": {...}}
-
-[3] 2024-01-20 15:30:45.345678 | Status: 500 | Time: 89ms | X-Request-ID: 550e8400-e29b-41d4-a716-446655440003
+[2] 2025-07-30 00:45:12.238485 | Status: 500 | Time: 2026ms | X-Request-ID: 0705c6a8-e70b-4faa-b2a2-897eb2cca2c7
 {"error": "internal server error"}
+
+[3] 2025-07-30 00:45:12.238489 | Status: 200 | Time: 1770ms | X-Request-ID: f4961313-64cd-433b-9fca-2ab23bf4bb5a
+{"status": "ok", "data": {...}}
 
 === Summary ===
 Success: 2/3 (66.7%)
-Failed: 1/3 (33.3%)
-Average Response Time: 122ms
+
+=== Status Code Breakdown ===
+2xx (Success): 2
+5xx (Server Error): 1
+Average Response Time: 1749ms
 ```
 
 #### JSON形式
@@ -190,23 +193,23 @@ Average Response Time: 122ms
     "method": "POST",
     "concurrent": 3,
     "total_requests": 3,
-    "started_at": "2024-01-20T15:30:45.123456Z",
-    "completed_at": "2024-01-20T15:30:45.456789Z",
-    "total_duration_ms": 333
+    "started_at": "2025-07-30T00:45:12.238456Z",
+    "completed_at": "2025-07-30T00:45:14.264832Z",
+    "total_duration_ms": 2026
   },
   "results": [
     {
       "index": 1,
-      "request_id": "550e8400-e29b-41d4-a716-446655440001",
-      "started_at": "2024-01-20T15:30:45.123456Z",
-      "completed_at": "2024-01-20T15:30:45.268456Z",
-      "duration_ms": 145,
+      "request_id": "1baa21bf-589e-4188-a805-96213490eb14",
+      "started_at": "2025-07-30T00:45:12.238456Z",
+      "completed_at": "2025-07-30T00:45:13.690456Z",
+      "duration_ms": 1452,
       "request": {
         "method": "POST",
         "url": "https://api.example.com/users",
         "headers": {
           "Content-Type": "application/json",
-          "X-Request-ID": "550e8400-e29b-41d4-a716-446655440001"
+          "X-Request-ID": "1baa21bf-589e-4188-a805-96213490eb14"
         },
         "body": "{\"name\":\"test user\"}"
       },
