@@ -26,6 +26,10 @@ conreqは、同一のAPIエンドポイントに対して複数の並行HTTPリ�
 ### Homebrew (macOS/Linux)
 
 ```bash
+# ワンライナーインストール
+brew install shiroemons/tap/conreq
+
+# または、tapを追加してからインストール
 brew tap shiroemons/tap
 brew install conreq
 ```
