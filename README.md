@@ -23,7 +23,30 @@ conreqは、同一のAPIエンドポイントに対して複数の並行HTTPリ�
 
 ## インストール
 
-### Go 1.24以降がインストールされている場合
+### Homebrew (macOS/Linux)
+
+```bash
+brew tap shiroemons/tap
+brew install conreq
+```
+
+### バイナリダウンロード
+
+[Releases](https://github.com/shiroemons/conreq/releases)ページから最新のバイナリをダウンロードしてください。
+
+```bash
+# macOS (Apple Silicon)
+curl -L https://github.com/shiroemons/conreq/releases/latest/download/conreq_Darwin_arm64.tar.gz | tar xz
+sudo mv conreq /usr/local/bin/
+
+# macOS (Intel)
+curl -L https://github.com/shiroemons/conreq/releases/latest/download/conreq_Darwin_x86_64.tar.gz | tar xz
+sudo mv conreq /usr/local/bin/
+```
+
+### Go install
+
+Go 1.24以降がインストールされている場合：
 
 ```bash
 go install github.com/shiroemons/conreq/cmd/conreq@latest
