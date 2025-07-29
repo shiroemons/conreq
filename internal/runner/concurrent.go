@@ -14,6 +14,7 @@ type Result struct {
 	Responses []*client.Response
 	StartTime time.Time
 	EndTime   time.Time
+	Config    *config.Config
 }
 
 type Runner struct {
@@ -32,6 +33,7 @@ func (r *Runner) Run(ctx context.Context) (*Result, error) {
 	result := &Result{
 		StartTime: time.Now(),
 		Responses: make([]*client.Response, 0, r.config.Count),
+		Config:    r.config,
 	}
 
 	responseChan := make(chan *client.Response, r.config.Count)

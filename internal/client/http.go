@@ -20,6 +20,7 @@ type Response struct {
 	Timestamp      time.Time
 	RequestIndex   int
 	Error          error
+	StatusText     string
 }
 
 type Client struct {
@@ -44,6 +45,7 @@ func (c *Client) Do(ctx context.Context, requestIndex int) *Response {
 	response := &Response{
 		RequestIndex: requestIndex,
 		Timestamp:    start,
+		RequestID:    c.config.RequestID,
 	}
 
 	req, err := c.createRequest(ctx)
@@ -62,8 +64,12 @@ func (c *Client) Do(ctx context.Context, requestIndex int) *Response {
 	defer resp.Body.Close()
 
 	response.StatusCode = resp.StatusCode
+	response.StatusText = http.StatusText(resp.StatusCode)
 	response.Headers = resp.Header
-	response.RequestID = resp.Header.Get(c.config.RequestIDHeader)
+	// レスポンスヘッダーからRequestIDを取得するか、送信したものを使用
+	if responseID := resp.Header.Get(c.config.RequestIDHeader); responseID != "" {
+		response.RequestID = responseID
+	}
 	response.Duration = time.Since(start)
 
 	body, err := io.ReadAll(resp.Body)
@@ -113,6 +119,7 @@ func (c *Client) DoWithDelay(ctx context.Context, requestIndex int, delay time.D
 				RequestIndex: requestIndex,
 				Error:        ctx.Err(),
 				Timestamp:    time.Now(),
+				RequestID:    c.config.RequestID,
 			}
 		}
 	}
