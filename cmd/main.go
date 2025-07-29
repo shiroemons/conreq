@@ -133,7 +133,7 @@ APIの挙動を検証するためのツールです。`,
 			if cfg.OutputJSON {
 				formatter = output.NewSpecJSONFormatter(outputWriter, cfg)
 			} else {
-				formatter = output.NewTextFormatter(outputWriter)
+				formatter = output.NewSpecTextFormatter(outputWriter)
 			}
 
 			return formatter.Format(result)
