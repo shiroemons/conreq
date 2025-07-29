@@ -65,19 +65,19 @@ type SpecJSONResult struct {
 
 // SpecJSONSummary represents the summary in the JSON output.
 type SpecJSONSummary struct {
-	Total             int            `json:"total"`
-	Successful        int            `json:"successful"`
-	Failed            int            `json:"failed"`
-	SuccessRate       float64        `json:"success_rate"`
-	AverageDurationMs int64          `json:"average_duration_ms"`
-	MinDurationMs     int64          `json:"min_duration_ms"`
-	MaxDurationMs     int64          `json:"max_duration_ms"`
-	StatusCodes       map[string]int `json:"status_codes"`
+	Total               int            `json:"total"`
+	Successful          int            `json:"successful"`
+	Failed              int            `json:"failed"`
+	SuccessRate         float64        `json:"success_rate"`
+	AverageDurationMs   int64          `json:"average_duration_ms"`
+	MinDurationMs       int64          `json:"min_duration_ms"`
+	MaxDurationMs       int64          `json:"max_duration_ms"`
+	StatusCodes         map[string]int `json:"status_codes"`
 	StatusCodeBreakdown struct {
-		Count2xx int `json:"2xx"`
-		Count3xx int `json:"3xx"`
-		Count4xx int `json:"4xx"`
-		Count5xx int `json:"5xx"`
+		Count2xx      int `json:"2xx"`
+		Count3xx      int `json:"3xx"`
+		Count4xx      int `json:"4xx"`
+		Count5xx      int `json:"5xx"`
 		NetworkErrors int `json:"network_errors"`
 	} `json:"status_code_breakdown"`
 }
@@ -229,7 +229,7 @@ func (f *SpecJSONFormatter) Format(result *runner.Result) error {
 		MaxDurationMs:     maxDuration,
 		StatusCodes:       statusCodes,
 	}
-	
+
 	// Status code breakdown
 	output.Summary.StatusCodeBreakdown.Count2xx = result.Count2xx()
 	output.Summary.StatusCodeBreakdown.Count3xx = result.Count3xx()

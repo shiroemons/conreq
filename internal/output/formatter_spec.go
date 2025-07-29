@@ -97,13 +97,13 @@ func (f *SpecTextFormatter) Format(result *runner.Result) error {
 	}
 
 	fmt.Fprintf(f.writer, "Success: %d/%d (%.1f%%)\n", successCount, total, successRate)
-	
+
 	// Status code breakdown
 	count2xx := result.Count2xx()
 	count3xx := result.Count3xx()
 	count4xx := result.Count4xx()
 	count5xx := result.Count5xx()
-	
+
 	fmt.Fprintln(f.writer, "\n=== Status Code Breakdown ===")
 	if count2xx > 0 {
 		fmt.Fprintf(f.writer, "2xx (Success): %d\n", count2xx)
