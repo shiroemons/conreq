@@ -41,7 +41,7 @@ func (f *ProgressFormatter) Start() {
 // FormatProgress formats a single progress update.
 func (f *ProgressFormatter) FormatProgress(p *runner.Progress) {
 	elapsed := time.Since(f.startTime)
-	timeStr := time.Now().Format("15:04:05.000000")
+	timeStr := p.StartTime.Format("15:04:05.000000")
 	requestStr := fmt.Sprintf("Request %*d", f.requestWidth-7, p.Index+1)
 
 	var statusIcon, statusText, httpCode string
