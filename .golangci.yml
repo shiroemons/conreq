@@ -1,7 +1,7 @@
 # golangci-lint v2 configuration
 # https://golangci-lint.run/usage/configuration/
 
-version: 2
+version: "2"
 
 run:
   timeout: 5m
@@ -9,7 +9,6 @@ run:
 
 linters:
   enable:
-    # - errcheck # fmt.Fprintlnのエラーチェックが多すぎるため無効化
     - govet
     - ineffassign
     - staticcheck
@@ -18,7 +17,6 @@ linters:
     - dogsled
     - dupl
     - errorlint
-    # - funlen # 長い関数は必要に応じて許可
     - goconst
     - gocritic
     - gocyclo
@@ -33,11 +31,10 @@ linters:
     - unparam
     - whitespace
 
-linters-settings:
+linters-config:
   errcheck:
     check-type-assertions: true
     check-blank: true
-    # fmt.Print系は除外
     exclude-functions:
       - fmt.Fprint
       - fmt.Fprintf
@@ -93,29 +90,5 @@ linters-settings:
       - name: package-comments
 
 issues:
-  exclude-dirs-use-default: true
-  exclude-case-sensitive: false
   max-issues-per-linter: 0
   max-same-issues: 0
-
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - dupl
-        - errcheck
-        - funlen
-        - goconst
-        - gosec
-        - lll
-
-    - path: cmd/
-      linters:
-        - funlen
-
-  exclude:
-    # fmt.Print系のエラーは無視
-    - Error return value of `fmt\.(Fprint|Fprintf|Fprintln|Print|Printf|Println)` is not checked
-    # defer closeのエラーは無視
-    - Error return value of `.*\.Close` is not checked
-    # os.Stderr/Stdoutへの書き込みエラーは無視
-    - Error return value of .((os\.)?std(out|err)\..*|.*Flush|os\.Remove(All)?|os\.(Un)?Setenv). is not checked
