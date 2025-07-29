@@ -73,6 +73,13 @@ type SpecJSONSummary struct {
 	MinDurationMs     int64          `json:"min_duration_ms"`
 	MaxDurationMs     int64          `json:"max_duration_ms"`
 	StatusCodes       map[string]int `json:"status_codes"`
+	StatusCodeBreakdown struct {
+		Count2xx int `json:"2xx"`
+		Count3xx int `json:"3xx"`
+		Count4xx int `json:"4xx"`
+		Count5xx int `json:"5xx"`
+		NetworkErrors int `json:"network_errors"`
+	} `json:"status_code_breakdown"`
 }
 
 // SpecJSONOutput represents the complete JSON output structure.
@@ -222,6 +229,13 @@ func (f *SpecJSONFormatter) Format(result *runner.Result) error {
 		MaxDurationMs:     maxDuration,
 		StatusCodes:       statusCodes,
 	}
+	
+	// Status code breakdown
+	output.Summary.StatusCodeBreakdown.Count2xx = result.Count2xx()
+	output.Summary.StatusCodeBreakdown.Count3xx = result.Count3xx()
+	output.Summary.StatusCodeBreakdown.Count4xx = result.Count4xx()
+	output.Summary.StatusCodeBreakdown.Count5xx = result.Count5xx()
+	output.Summary.StatusCodeBreakdown.NetworkErrors = result.ErrorCount()
 
 	encoder := json.NewEncoder(f.writer)
 	encoder.SetIndent("", "  ")

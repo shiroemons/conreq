@@ -97,6 +97,29 @@ func (f *SpecTextFormatter) Format(result *runner.Result) error {
 	}
 
 	fmt.Fprintf(f.writer, "Success: %d/%d (%.1f%%)\n", successCount, total, successRate)
+	
+	// Status code breakdown
+	count2xx := result.Count2xx()
+	count3xx := result.Count3xx()
+	count4xx := result.Count4xx()
+	count5xx := result.Count5xx()
+	
+	fmt.Fprintln(f.writer, "\n=== Status Code Breakdown ===")
+	if count2xx > 0 {
+		fmt.Fprintf(f.writer, "2xx (Success): %d\n", count2xx)
+	}
+	if count3xx > 0 {
+		fmt.Fprintf(f.writer, "3xx (Redirect): %d\n", count3xx)
+	}
+	if count4xx > 0 {
+		fmt.Fprintf(f.writer, "4xx (Client Error): %d\n", count4xx)
+	}
+	if count5xx > 0 {
+		fmt.Fprintf(f.writer, "5xx (Server Error): %d\n", count5xx)
+	}
+	if errorCount > 0 {
+		fmt.Fprintf(f.writer, "Network/Timeout Errors: %d\n", errorCount)
+	}
 
 	if errorCount > 0 {
 		errorRate := float64(errorCount) / float64(total) * 100

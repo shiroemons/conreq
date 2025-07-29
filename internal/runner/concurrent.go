@@ -117,7 +117,7 @@ func (r *Result) ErrorCount() int {
 func (r *Result) SuccessCount() int {
 	count := 0
 	for _, resp := range r.Responses {
-		if resp.Error == nil {
+		if resp.Error == nil && resp.StatusCode >= 200 && resp.StatusCode < 300 {
 			count++
 		}
 	}
@@ -133,7 +133,7 @@ func (r *Result) AverageDuration() time.Duration {
 	var total time.Duration
 	successCount := 0
 	for _, resp := range r.Responses {
-		if resp.Error == nil {
+		if resp.Error == nil && resp.StatusCode >= 200 && resp.StatusCode < 300 {
 			total += resp.Duration
 			successCount++
 		}
@@ -144,4 +144,48 @@ func (r *Result) AverageDuration() time.Duration {
 	}
 
 	return total / time.Duration(successCount)
+}
+
+// Count2xx returns the number of 2xx responses.
+func (r *Result) Count2xx() int {
+	count := 0
+	for _, resp := range r.Responses {
+		if resp.Error == nil && resp.StatusCode >= 200 && resp.StatusCode < 300 {
+			count++
+		}
+	}
+	return count
+}
+
+// Count3xx returns the number of 3xx responses.
+func (r *Result) Count3xx() int {
+	count := 0
+	for _, resp := range r.Responses {
+		if resp.Error == nil && resp.StatusCode >= 300 && resp.StatusCode < 400 {
+			count++
+		}
+	}
+	return count
+}
+
+// Count4xx returns the number of 4xx responses.
+func (r *Result) Count4xx() int {
+	count := 0
+	for _, resp := range r.Responses {
+		if resp.Error == nil && resp.StatusCode >= 400 && resp.StatusCode < 500 {
+			count++
+		}
+	}
+	return count
+}
+
+// Count5xx returns the number of 5xx responses.
+func (r *Result) Count5xx() int {
+	count := 0
+	for _, resp := range r.Responses {
+		if resp.Error == nil && resp.StatusCode >= 500 && resp.StatusCode < 600 {
+			count++
+		}
+	}
+	return count
 }
