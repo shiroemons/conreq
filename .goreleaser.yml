@@ -3,12 +3,9 @@ version: 2
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
 
 builds:
-  - main: ./cmd/main.go
-    binary: conreq
-    env:
+  - env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -17,21 +14,24 @@ builds:
     goarch:
       - amd64
       - arm64
+    main: ./cmd/conreq
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
 
 archives:
   - format: tar.gz
     name_template: >-
       {{ .ProjectName }}_
-      {{- .Version }}_
       {{- title .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
 
 checksum:
   name_template: 'checksums.txt'
@@ -45,15 +45,3 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
-      - '^chore:'
-      - '^style:'
-      - '^refactor:'
-      - '^ci:'
-
-release:
-  github:
-    owner: shiroemons
-    name: conreq
-  draft: false
-  prerelease: auto
-  name_template: "{{.ProjectName}} v{{.Version}}"

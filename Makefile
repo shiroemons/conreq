@@ -4,7 +4,7 @@ help: ## Show this help
 
 .PHONY: build
 build: ## Build the binary
-	go build -o bin/conreq ./cmd
+	go build -ldflags "-s -w -X main.version=$$(git describe --tags --always) -X main.commit=$$(git rev-parse --short HEAD) -X main.date=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" -o bin/conreq ./cmd/conreq
 
 .PHONY: test
 test: ## Run tests
@@ -41,11 +41,11 @@ mod-tidy: ## Tidy go.mod
 
 .PHONY: run
 run: ## Run the application (example: make run ARGS="https://httpbin.org/get")
-	go run ./cmd $(ARGS)
+	go run -ldflags "-s -w -X main.version=$$(git describe --tags --always) -X main.commit=$$(git rev-parse --short HEAD) -X main.date=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" ./cmd/conreq $(ARGS)
 
 .PHONY: install
 install: ## Install conreq to GOPATH/bin
-	go install ./cmd
+	go install -ldflags "-s -w -X main.version=$$(git describe --tags --always) -X main.commit=$$(git rev-parse --short HEAD) -X main.date=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" ./cmd/conreq
 
 .PHONY: docker-build
 docker-build: ## Build Docker image
