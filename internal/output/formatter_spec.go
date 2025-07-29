@@ -26,6 +26,7 @@ func (f *SpecTextFormatter) SetConfig(cfg interface{}) {
 }
 
 // Format formats the result according to the specification.
+//
 //nolint:errcheck // io.Writer への出力エラーは無視
 func (f *SpecTextFormatter) Format(result *runner.Result) error {
 	// Request Summary

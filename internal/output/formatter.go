@@ -28,6 +28,7 @@ func NewTextFormatter(w io.Writer) *TextFormatter {
 }
 
 // Format formats the result as plain text.
+//
 //nolint:errcheck // io.Writer への出力エラーは無視
 func (f *TextFormatter) Format(result *runner.Result) error {
 	fmt.Fprintln(f.writer, "=== 実行結果 ===")

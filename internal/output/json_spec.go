@@ -83,6 +83,7 @@ type SpecJSONOutput struct {
 }
 
 // Format formats the result as JSON according to the specification.
+//
 //nolint:funlen // 仕様に従った複雑な出力のため
 func (f *SpecJSONFormatter) Format(result *runner.Result) error {
 	output := SpecJSONOutput{
