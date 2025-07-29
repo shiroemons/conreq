@@ -82,7 +82,7 @@ func isValidHTTPMethod(method string) bool {
 		http.MethodHead,
 		http.MethodOptions,
 	}
-	
+
 	for _, valid := range validMethods {
 		if strings.EqualFold(method, valid) {
 			return true

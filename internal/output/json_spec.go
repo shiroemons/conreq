@@ -23,12 +23,12 @@ func NewSpecJSONFormatter(w io.Writer, cfg *config.Config) *SpecJSONFormatter {
 }
 
 type SpecJSONMetadata struct {
-	URL            string `json:"url"`
-	Method         string `json:"method"`
-	Concurrent     int    `json:"concurrent"`
-	TotalRequests  int    `json:"total_requests"`
-	StartedAt      string `json:"started_at"`
-	CompletedAt    string `json:"completed_at"`
+	URL             string `json:"url"`
+	Method          string `json:"method"`
+	Concurrent      int    `json:"concurrent"`
+	TotalRequests   int    `json:"total_requests"`
+	StartedAt       string `json:"started_at"`
+	CompletedAt     string `json:"completed_at"`
 	TotalDurationMs int64  `json:"total_duration_ms"`
 }
 
@@ -58,20 +58,20 @@ type SpecJSONResult struct {
 }
 
 type SpecJSONSummary struct {
-	Total              int            `json:"total"`
-	Successful         int            `json:"successful"`
-	Failed             int            `json:"failed"`
-	SuccessRate        float64        `json:"success_rate"`
-	AverageDurationMs  int64          `json:"average_duration_ms"`
-	MinDurationMs      int64          `json:"min_duration_ms"`
-	MaxDurationMs      int64          `json:"max_duration_ms"`
-	StatusCodes        map[string]int `json:"status_codes"`
+	Total             int            `json:"total"`
+	Successful        int            `json:"successful"`
+	Failed            int            `json:"failed"`
+	SuccessRate       float64        `json:"success_rate"`
+	AverageDurationMs int64          `json:"average_duration_ms"`
+	MinDurationMs     int64          `json:"min_duration_ms"`
+	MaxDurationMs     int64          `json:"max_duration_ms"`
+	StatusCodes       map[string]int `json:"status_codes"`
 }
 
 type SpecJSONOutput struct {
-	Metadata SpecJSONMetadata  `json:"metadata"`
-	Results  []SpecJSONResult  `json:"results"`
-	Summary  SpecJSONSummary   `json:"summary"`
+	Metadata SpecJSONMetadata `json:"metadata"`
+	Results  []SpecJSONResult `json:"results"`
+	Summary  SpecJSONSummary  `json:"summary"`
 }
 
 func (f *SpecJSONFormatter) Format(result *runner.Result) error {
@@ -167,10 +167,10 @@ func (f *SpecJSONFormatter) Format(result *runner.Result) error {
 			statusCodeStr := fmt.Sprintf("%d", statusCode)
 			statusCodes[statusCodeStr]++
 			successCount++
-			
+
 			durationMs := resp.Duration.Milliseconds()
 			totalDuration += durationMs
-			
+
 			if firstSuccess {
 				minDuration = durationMs
 				maxDuration = durationMs
@@ -193,7 +193,7 @@ func (f *SpecJSONFormatter) Format(result *runner.Result) error {
 	failed := total - successCount
 	successRate := 0.0
 	avgDuration := int64(0)
-	
+
 	if total > 0 {
 		successRate = float64(successCount) / float64(total) * 100
 	}

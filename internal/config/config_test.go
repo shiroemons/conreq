@@ -7,19 +7,19 @@ import (
 
 func TestNewConfig(t *testing.T) {
 	cfg := NewConfig()
-	
+
 	if cfg.Method != "GET" {
 		t.Errorf("Expected default method to be GET, got %s", cfg.Method)
 	}
-	
+
 	if cfg.Count != 1 {
 		t.Errorf("Expected default count to be 1, got %d", cfg.Count)
 	}
-	
+
 	if cfg.Timeout != 30*time.Second {
 		t.Errorf("Expected default timeout to be 30s, got %v", cfg.Timeout)
 	}
-	
+
 	if cfg.Headers == nil {
 		t.Error("Expected headers map to be initialized")
 	}
@@ -103,7 +103,7 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.config.Validate()
@@ -156,21 +156,21 @@ func TestParseHeaders(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := NewConfig()
 			err := cfg.ParseHeaders(tt.headers)
-			
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseHeaders() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			
+
 			if !tt.wantErr {
 				if len(cfg.Headers) != len(tt.want) {
 					t.Errorf("Expected %d headers, got %d", len(tt.want), len(cfg.Headers))
 				}
-				
+
 				for key, value := range tt.want {
 					if cfg.Headers[key] != value {
 						t.Errorf("Expected header %s = %s, got %s", key, value, cfg.Headers[key])
@@ -197,7 +197,7 @@ func TestIsValidHTTPMethod(t *testing.T) {
 		{"INVALID", false},
 		{"", false},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.method, func(t *testing.T) {
 			if got := isValidHTTPMethod(tt.method); got != tt.want {
@@ -245,7 +245,7 @@ func TestParseDuration(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := ParseDuration(tt.input)

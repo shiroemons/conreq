@@ -1,5 +1,12 @@
 # conreq
 
+[![Test](https://github.com/shiroemons/conreq/actions/workflows/test.yml/badge.svg)](https://github.com/shiroemons/conreq/actions/workflows/test.yml)
+[![Lint](https://github.com/shiroemons/conreq/actions/workflows/lint.yml/badge.svg)](https://github.com/shiroemons/conreq/actions/workflows/lint.yml)
+[![Build](https://github.com/shiroemons/conreq/actions/workflows/build.yml/badge.svg)](https://github.com/shiroemons/conreq/actions/workflows/build.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/shiroemons/conreq)](https://goreportcard.com/report/github.com/shiroemons/conreq)
+[![Go Reference](https://pkg.go.dev/badge/github.com/shiroemons/conreq.svg)](https://pkg.go.dev/github.com/shiroemons/conreq)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 conreqは、同一のAPIエンドポイントに対して複数の並行HTTPリクエストを送信し、APIの挙動を検証するためのCLIツールです。
 
 ## 特徴

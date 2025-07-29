@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/shiroemons/conreq/internal/config"
 	"github.com/shiroemons/conreq/internal/output"
 	"github.com/shiroemons/conreq/internal/runner"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -27,19 +27,19 @@ func main() {
 
 func newRootCmd() *cobra.Command {
 	var (
-		method           string
-		concurrent       int
-		headers          []string
-		data             string
-		requestID        string
-		sameRequestID    bool
-		requestIDHeader  string
-		delay            string
-		timeout          string
-		noBody           bool
-		outputJSON       bool
-		outputFile       string
-		showVersion      bool
+		method          string
+		concurrent      int
+		headers         []string
+		data            string
+		requestID       string
+		sameRequestID   bool
+		requestIDHeader string
+		delay           string
+		timeout         string
+		noBody          bool
+		outputJSON      bool
+		outputFile      string
+		showVersion     bool
 	)
 
 	cmd := &cobra.Command{

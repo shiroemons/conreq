@@ -12,15 +12,15 @@ import (
 )
 
 type Response struct {
-	RequestID      string
-	StatusCode     int
-	Headers        http.Header
-	Body           string
-	Duration       time.Duration
-	Timestamp      time.Time
-	RequestIndex   int
-	Error          error
-	StatusText     string
+	RequestID    string
+	StatusCode   int
+	Headers      http.Header
+	Body         string
+	Duration     time.Duration
+	Timestamp    time.Time
+	RequestIndex int
+	Error        error
+	StatusText   string
 }
 
 type Client struct {

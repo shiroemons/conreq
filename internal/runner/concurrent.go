@@ -66,10 +66,10 @@ func (r *Runner) Run(ctx context.Context) (*Result, error) {
 			}
 
 			client := client.NewClient(&cfg)
-			
+
 			delay := time.Duration(index) * r.config.Delay
 			response := client.DoWithDelay(ctx, index, delay)
-			
+
 			responseChan <- response
 		}(i)
 	}

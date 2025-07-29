@@ -29,21 +29,21 @@ func (f *SpecTextFormatter) Format(result *runner.Result) error {
 	fmt.Fprintf(f.writer, "Method: %s\n", result.Config.Method)
 	fmt.Fprintf(f.writer, "Concurrent: %d\n", result.Config.Count)
 	fmt.Fprintf(f.writer, "Total Requests: %d\n", len(result.Responses))
-	
+
 	// Results
 	fmt.Fprintln(f.writer, "\n=== Results ===")
-	
+
 	// インデックス順にソート
 	sortedResponses := make([]*client.Response, len(result.Responses))
 	copy(sortedResponses, result.Responses)
 	sort.Slice(sortedResponses, func(i, j int) bool {
 		return sortedResponses[i].RequestIndex < sortedResponses[j].RequestIndex
 	})
-	
+
 	for _, resp := range sortedResponses {
 		index := resp.RequestIndex + 1
 		timestamp := resp.Timestamp.Format("2006-01-02 15:04:05.000000")
-		
+
 		if resp.Error != nil {
 			// エラーの場合
 			fmt.Fprintf(f.writer, "[%d] %s | Status: ERROR | Time: %dms | %s: %s\n",
@@ -64,7 +64,7 @@ func (f *SpecTextFormatter) Format(result *runner.Result) error {
 				result.Config.RequestIDHeader,
 				resp.RequestID,
 			)
-			
+
 			// レスポンスボディ
 			if !result.Config.NoBody {
 				fmt.Fprintln(f.writer, resp.Body)
@@ -72,35 +72,35 @@ func (f *SpecTextFormatter) Format(result *runner.Result) error {
 				fmt.Fprintln(f.writer, "[Body omitted]")
 			}
 		}
-		
+
 		if index < len(sortedResponses) {
 			fmt.Fprintln(f.writer)
 		}
 	}
-	
+
 	// Summary
 	fmt.Fprintln(f.writer, "\n=== Summary ===")
-	
+
 	successCount := result.SuccessCount()
 	errorCount := result.ErrorCount()
 	total := len(result.Responses)
-	
+
 	successRate := 0.0
 	if total > 0 {
 		successRate = float64(successCount) / float64(total) * 100
 	}
-	
+
 	fmt.Fprintf(f.writer, "Success: %d/%d (%.1f%%)\n", successCount, total, successRate)
-	
+
 	if errorCount > 0 {
 		errorRate := float64(errorCount) / float64(total) * 100
 		fmt.Fprintf(f.writer, "Failed: %d/%d (%.1f%%)\n", errorCount, total, errorRate)
 	}
-	
+
 	if successCount > 0 {
 		avgDuration := result.AverageDuration()
 		fmt.Fprintf(f.writer, "Average Response Time: %dms\n", avgDuration.Milliseconds())
 	}
-	
+
 	return nil
 }

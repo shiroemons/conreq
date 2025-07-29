@@ -7,23 +7,23 @@ import (
 func TestGenerate(t *testing.T) {
 	id1 := Generate()
 	id2 := Generate()
-	
+
 	if id1 == "" {
 		t.Error("Generate() returned empty string")
 	}
-	
+
 	if id2 == "" {
 		t.Error("Generate() returned empty string")
 	}
-	
+
 	if id1 == id2 {
 		t.Error("Generate() returned the same ID twice")
 	}
-	
+
 	if !IsValid(id1) {
 		t.Errorf("Generated ID %s is not valid", id1)
 	}
-	
+
 	if !IsValid(id2) {
 		t.Errorf("Generated ID %s is not valid", id2)
 	}
@@ -61,7 +61,7 @@ func TestIsValid(t *testing.T) {
 			want: false,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsValid(tt.id); got != tt.want {

@@ -28,14 +28,14 @@ type JSONResponse struct {
 }
 
 type JSONResult struct {
-	StartTime    string          `json:"start_time"`
-	EndTime      string          `json:"end_time"`
-	TotalTime    string          `json:"total_time"`
-	RequestCount int             `json:"request_count"`
-	SuccessCount int             `json:"success_count"`
-	ErrorCount   int             `json:"error_count"`
-	AvgDuration  string          `json:"average_duration,omitempty"`
-	Responses    []JSONResponse  `json:"responses"`
+	StartTime    string         `json:"start_time"`
+	EndTime      string         `json:"end_time"`
+	TotalTime    string         `json:"total_time"`
+	RequestCount int            `json:"request_count"`
+	SuccessCount int            `json:"success_count"`
+	ErrorCount   int            `json:"error_count"`
+	AvgDuration  string         `json:"average_duration,omitempty"`
+	Responses    []JSONResponse `json:"responses"`
 }
 
 func (f *JSONFormatter) Format(result *runner.Result) error {
@@ -66,7 +66,7 @@ func (f *JSONFormatter) Format(result *runner.Result) error {
 		} else {
 			jsonResp.StatusCode = resp.StatusCode
 			jsonResp.Body = resp.Body
-			
+
 			jsonResp.Headers = make(map[string]string)
 			for key, values := range resp.Headers {
 				if len(values) > 0 {

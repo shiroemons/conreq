@@ -1,0 +1,197 @@
+run:
+  timeout: 5m
+  go: '1.24'
+  build-tags:
+    - integration
+
+linters:
+  enable:
+    - gofmt
+    - goimports
+    - govet
+    - ineffassign
+    - misspell
+    - unconvert
+    - prealloc
+    - nakedret
+    - gocyclo
+    - gosec
+    - revive
+    - errorlint
+    - staticcheck
+    - gosimple
+    - unused
+    - typecheck
+    - bodyclose
+    - noctx
+    - rowserrcheck
+    - sqlclosecheck
+    - structcheck
+    - tparallel
+    - unparam
+    - wastedassign
+    - whitespace
+    - wsl
+    - godot
+    - godox
+    - goerr113
+    - gomnd
+    - gomodguard
+    - goprintffuncname
+    - lll
+    - makezero
+    - nestif
+    - nilerr
+    - nolintlint
+    - predeclared
+    - promlinter
+    - testpackage
+    - thelper
+
+  disable:
+    - exhaustive
+    - gochecknoglobals
+    - gochecknoinits
+    - goconst
+    - gocognit
+    - cyclop
+    - dupl
+    - funlen
+    - gocyclo
+    - depguard
+    - dogsled
+    - errcheck
+    - forbidigo
+    - forcetypeassert
+    - gci
+    - gofumpt
+    - goheader
+    - ifshort
+    - importas
+    - maintidx
+    - maligned
+    - nlreturn
+    - paralleltest
+    - scopelint
+    - tagliatelle
+    - varnamelen
+    - wrapcheck
+    - exhaustruct
+
+linters-settings:
+  revive:
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: empty-block
+      - name: superfluous-else
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: redefines-builtin-id
+
+  goimports:
+    local-prefixes: github.com/shiroemons/conreq
+
+  gocyclo:
+    min-complexity: 15
+
+  maligned:
+    suggest-new: true
+
+  dupl:
+    threshold: 100
+
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+
+  misspell:
+    locale: US
+
+  lll:
+    line-length: 140
+
+  gomnd:
+    settings:
+      mnd:
+        checks:
+          - argument
+          - case
+          - condition
+          - return
+
+  gomodguard:
+    allowed:
+      modules:
+        - github.com/spf13/cobra
+        - github.com/google/uuid
+      domains: []
+    blocked:
+      modules: []
+      versions: []
+
+  errorlint:
+    errorf: true
+
+  godot:
+    scope: all
+    exclude:
+      - "^fixme:"
+      - "^todo:"
+    capital: true
+
+  nestif:
+    min-complexity: 6
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+        - gomnd
+        - unparam
+        - lll
+        - goerr113
+        - wsl
+        - noctx
+        - testpackage
+        - govet
+
+    - path: cmd/
+      linters:
+        - gochecknoglobals
+        - gomnd
+        - goerr113
+        - wsl
+
+    - path: internal/output/
+      linters:
+        - gomnd
+
+    - linters:
+        - lll
+      source: "^//go:generate "
+
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
