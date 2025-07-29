@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime/debug"
 	"strings"
 
 	"github.com/shiroemons/conreq/internal/config"
@@ -18,6 +19,29 @@ var (
 	commit  = "none"
 	date    = "unknown"
 )
+
+func init() {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		if version == "dev" {
+			version = info.Main.Version
+		}
+		for _, setting := range info.Settings {
+			switch setting.Key {
+			case "vcs.revision":
+				if commit == "none" {
+					commit = setting.Value
+					if len(commit) > 7 {
+						commit = commit[:7]
+					}
+				}
+			case "vcs.time":
+				if date == "unknown" {
+					date = setting.Value
+				}
+			}
+		}
+	}
+}
 
 func main() {
 	if err := newRootCmd().Execute(); err != nil {
