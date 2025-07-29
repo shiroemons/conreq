@@ -5,11 +5,13 @@ conreqは、同一のAPIエンドポイントに対して複数の並行HTTPリ�
 ## 特徴
 
 - 1〜5個の並行HTTPリクエストを送信
-- X-Request-IDヘッダーの自動生成またはカスタム値の設定
+- Request IDヘッダーの自動生成またはカスタム値の設定
+- 同一Request IDでの複数リクエスト送信
+- Request IDヘッダー名のカスタマイズ
 - リクエスト間の遅延時間設定
 - タイムアウト制御
 - テキストまたはJSON形式での結果出力
-- ファイルからのリクエストボディ読み込み
+- ファイルからのリクエストボディ読み込み（@記法対応）
 - 全HTTPメソッドのサポート（GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS）
 
 ## インストール
@@ -37,13 +39,16 @@ go build -o conreq cmd/main.go
 conreq https://api.example.com/endpoint
 
 # 3つの並行GETリクエスト
-conreq https://api.example.com/endpoint -n 3
+conreq https://api.example.com/endpoint -c 3
 
 # POSTリクエストでJSONボディを送信
 conreq https://api.example.com/endpoint -X POST -d '{"key": "value"}' -H "Content-Type: application/json"
 
 # ファイルからボディを読み込んでPOSTリクエスト
-conreq https://api.example.com/endpoint -X POST -f request_body.json -H "Content-Type: application/json"
+conreq https://api.example.com/endpoint -X POST -d @request_body.json -H "Content-Type: application/json"
+
+# 同一Request IDで複数リクエストを送信
+conreq https://api.example.com/endpoint -c 3 --same-request-id
 ```
 
 ### コマンドラインオプション
@@ -51,14 +56,17 @@ conreq https://api.example.com/endpoint -X POST -f request_body.json -H "Content
 | オプション | 短縮形 | 説明 | デフォルト |
 |-----------|--------|------|------------|
 | `--method` | `-X` | HTTPメソッド (GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS) | GET |
-| `--count` | `-n` | 同時リクエスト数 (1-5) | 1 |
+| `--concurrent` | `-c` | 同時リクエスト数 (1-5) | 1 |
 | `--header` | `-H` | カスタムヘッダー（複数指定可） | なし |
-| `--data` | `-d` | リクエストボディ | なし |
-| `--data-file` | `-f` | リクエストボディを含むファイルパス | なし |
-| `--request-id` | `-r` | X-Request-IDヘッダーの値 | 自動生成 |
+| `--data` | `-d` | リクエストボディ（@でファイル指定可） | なし |
+| `--same-request-id` | | 全リクエストで同一のRequest IDを使用 | false |
+| `--request-id` | | カスタムRequest ID値を指定 | UUID v4自動生成 |
+| `--request-id-header` | | Request IDヘッダー名 | X-Request-ID |
 | `--delay` | | リクエスト間の遅延時間 | 0s |
-| `--timeout` | `-t` | リクエストタイムアウト | 30s |
-| `--json` | `-j` | JSON形式で出力 | false |
+| `--timeout` | | タイムアウト時間 | 30s |
+| `--no-body` | | レスポンスボディを非表示（JSON出力時は無視） | false |
+| `--json` | | JSON形式で出力 | false |
+| `--output` | `-o` | 結果をファイルに出力 | 標準出力 |
 | `--version` | `-v` | バージョン情報を表示 | - |
 | `--help` | `-h` | ヘルプを表示 | - |
 
@@ -67,47 +75,81 @@ conreq https://api.example.com/endpoint -X POST -f request_body.json -H "Content
 #### テキスト形式（デフォルト）
 
 ```
-=== 実行結果 ===
-開始時刻: 2025-07-29T11:49:25+09:00
-終了時刻: 2025-07-29T11:49:26+09:00
-総実行時間: 860.596291ms
-リクエスト数: 3
-成功数: 3
-エラー数: 0
-平均レスポンス時間: 833.091403ms
+=== Request Summary ===
+URL: https://api.example.com/users
+Method: GET
+Concurrent: 3
+Total Requests: 3
 
-=== リクエスト詳細 ===
-No  Request ID                            Status  Duration      Time
-1   550e8400-e29b-41d4-a716-446655440000  200     860.223292ms  11:49:25.631
-2   6ba7b810-9dad-11d1-80b4-00c04fd430c8  200     819.191417ms  11:49:25.631
-3   6ba7b814-9dad-11d1-80b4-00c04fd430c8  200     819.8595ms    11:49:25.632
+=== Results ===
+[1] 2024-01-20 15:30:45.123456 | Status: 200 | Time: 145ms | X-Request-ID: 550e8400-e29b-41d4-a716-446655440001
+{"status": "ok", "data": {...}}
+
+[2] 2024-01-20 15:30:45.234567 | Status: 200 | Time: 132ms | X-Request-ID: 550e8400-e29b-41d4-a716-446655440002
+{"status": "ok", "data": {...}}
+
+[3] 2024-01-20 15:30:45.345678 | Status: 500 | Time: 89ms | X-Request-ID: 550e8400-e29b-41d4-a716-446655440003
+{"error": "internal server error"}
+
+=== Summary ===
+Success: 2/3 (66.7%)
+Failed: 1/3 (33.3%)
+Average Response Time: 122ms
 ```
 
 #### JSON形式
 
 ```json
 {
-  "start_time": "2025-07-29T11:49:31+09:00",
-  "end_time": "2025-07-29T11:49:32+09:00",
-  "total_time": "1.124951666s",
-  "request_count": 2,
-  "success_count": 2,
-  "error_count": 0,
-  "average_duration": "965.623729ms",
-  "responses": [
+  "metadata": {
+    "url": "https://api.example.com/users",
+    "method": "POST",
+    "concurrent": 3,
+    "total_requests": 3,
+    "started_at": "2024-01-20T15:30:45.123456Z",
+    "completed_at": "2024-01-20T15:30:45.456789Z",
+    "total_duration_ms": 333
+  },
+  "results": [
     {
-      "request_id": "550e8400-e29b-41d4-a716-446655440000",
-      "status_code": 200,
-      "headers": {
-        "Content-Type": "application/json",
-        "Content-Length": "443"
+      "index": 1,
+      "request_id": "550e8400-e29b-41d4-a716-446655440001",
+      "started_at": "2024-01-20T15:30:45.123456Z",
+      "completed_at": "2024-01-20T15:30:45.268456Z",
+      "duration_ms": 145,
+      "request": {
+        "method": "POST",
+        "url": "https://api.example.com/users",
+        "headers": {
+          "Content-Type": "application/json",
+          "X-Request-ID": "550e8400-e29b-41d4-a716-446655440001"
+        },
+        "body": "{\"name\":\"test user\"}"
       },
-      "body": "{...}",
-      "duration": "806.336542ms",
-      "timestamp": "2025-07-29T11:49:31.54474+09:00",
-      "request_index": 0
+      "response": {
+        "status_code": 200,
+        "status_text": "OK",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"status\":\"ok\",\"data\":{\"id\":1,\"name\":\"test user\"}}"
+      },
+      "error": null
     }
-  ]
+  ],
+  "summary": {
+    "total": 3,
+    "successful": 2,
+    "failed": 1,
+    "success_rate": 66.7,
+    "average_duration_ms": 122,
+    "min_duration_ms": 89,
+    "max_duration_ms": 145,
+    "status_codes": {
+      "200": 2,
+      "500": 1
+    }
+  }
 }
 ```
 
@@ -117,21 +159,21 @@ No  Request ID                            Status  Duration      Time
 
 ```bash
 # 5つの並行リクエストで負荷をかける
-conreq https://api.example.com/heavy-endpoint -n 5 -t 60s
+conreq https://api.example.com/heavy-endpoint -c 5 --timeout 60s
 ```
 
 ### レート制限の検証
 
 ```bash
 # 100ms間隔で5つのリクエストを送信
-conreq https://api.example.com/rate-limited -n 5 --delay 100ms
+conreq https://api.example.com/rate-limited -c 5 --delay 100ms
 ```
 
 ### 冪等性の確認
 
 ```bash
 # 同じX-Request-IDで複数のリクエストを送信
-conreq https://api.example.com/idempotent -n 3 -r "fixed-request-id"
+conreq https://api.example.com/idempotent -c 3 --request-id "fixed-request-id"
 ```
 
 ## 開発
