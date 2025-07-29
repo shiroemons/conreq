@@ -8,24 +8,30 @@ import (
 )
 
 type Config struct {
-	URL       string
-	Method    string
-	Count     int
-	Headers   map[string]string
-	Body      string
-	RequestID string
-	Delay     time.Duration
-	Timeout   time.Duration
-	OutputJSON bool
+	URL             string
+	Method          string
+	Count           int
+	Headers         map[string]string
+	Body            string
+	RequestID       string
+	SameRequestID   bool
+	RequestIDHeader string
+	Delay           time.Duration
+	Timeout         time.Duration
+	OutputJSON      bool
+	NoBody          bool
 }
 
 func NewConfig() *Config {
 	return &Config{
-		Method:  "GET",
-		Count:   1,
-		Headers: make(map[string]string),
-		Timeout: 30 * time.Second,
-		Delay:   0,
+		Method:          "GET",
+		Count:           1,
+		Headers:         make(map[string]string),
+		Timeout:         30 * time.Second,
+		Delay:           0,
+		RequestIDHeader: "X-Request-ID",
+		SameRequestID:   false,
+		NoBody:          false,
 	}
 }
 

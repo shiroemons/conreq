@@ -63,7 +63,7 @@ func (c *Client) Do(ctx context.Context, requestIndex int) *Response {
 
 	response.StatusCode = resp.StatusCode
 	response.Headers = resp.Header
-	response.RequestID = resp.Header.Get("X-Request-ID")
+	response.RequestID = resp.Header.Get(c.config.RequestIDHeader)
 	response.Duration = time.Since(start)
 
 	body, err := io.ReadAll(resp.Body)
@@ -92,7 +92,7 @@ func (c *Client) createRequest(ctx context.Context) (*http.Request, error) {
 	}
 
 	if c.config.RequestID != "" {
-		req.Header.Set("X-Request-ID", c.config.RequestID)
+		req.Header.Set(c.config.RequestIDHeader, c.config.RequestID)
 	}
 
 	if body != nil && req.Header.Get("Content-Type") == "" {

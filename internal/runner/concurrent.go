@@ -37,14 +37,30 @@ func (r *Runner) Run(ctx context.Context) (*Result, error) {
 	responseChan := make(chan *client.Response, r.config.Count)
 	var wg sync.WaitGroup
 
+	// 同一RequestIDモードの場合、事前に生成
+	var sharedRequestID string
+	if r.config.SameRequestID && r.config.RequestID == "" {
+		sharedRequestID = requestid.Generate()
+	}
+
 	for i := 0; i < r.config.Count; i++ {
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
 
 			cfg := *r.config
-			if cfg.RequestID == "" {
-				cfg.RequestID = requestid.Generate()
+			if r.config.SameRequestID {
+				// 同一RequestIDモード
+				if r.config.RequestID != "" {
+					cfg.RequestID = r.config.RequestID
+				} else {
+					cfg.RequestID = sharedRequestID
+				}
+			} else {
+				// 個別RequestIDモード
+				if cfg.RequestID == "" {
+					cfg.RequestID = requestid.Generate()
+				}
 			}
 
 			client := client.NewClient(&cfg)
