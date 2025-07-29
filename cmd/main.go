@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/shiroemons/conreq/internal/config"
+	"github.com/shiroemons/conreq/internal/output"
+	"github.com/shiroemons/conreq/internal/runner"
 )
 
 var (
@@ -40,19 +45,79 @@ func newRootCmd() *cobra.Command {
 		Long: `conreqは、同一のAPIエンドポイントに対して複数の並行HTTPリクエストを送信し、
 APIの挙動を検証するためのツールです。`,
 		Args: cobra.MaximumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if showVersion {
 				fmt.Printf("conreq version %s (commit: %s, built at: %s)\n", version, commit, date)
-				return
+				return nil
 			}
 
 			if len(args) == 0 {
-				cmd.Help()
-				return
+				return cmd.Help()
 			}
 
-			// TODO: 実装
-			fmt.Println("実装予定")
+			// 設定を作成
+			cfg := config.NewConfig()
+			cfg.URL = args[0]
+			cfg.Method = strings.ToUpper(method)
+			cfg.Count = count
+			cfg.RequestID = requestID
+			cfg.OutputJSON = outputJSON
+
+			// ヘッダーをパース
+			if err := cfg.ParseHeaders(headers); err != nil {
+				return err
+			}
+
+			// タイムアウトをパース
+			timeoutDuration, err := config.ParseDuration(timeout)
+			if err != nil {
+				return fmt.Errorf("無効なタイムアウト形式: %w", err)
+			}
+			cfg.Timeout = timeoutDuration
+
+			// 遅延時間をパース
+			delayDuration, err := config.ParseDuration(delay)
+			if err != nil {
+				return fmt.Errorf("無効な遅延時間形式: %w", err)
+			}
+			cfg.Delay = delayDuration
+
+			// リクエストボディの設定
+			if body != "" && bodyFile != "" {
+				return fmt.Errorf("--data と --data-file は同時に指定できません")
+			}
+
+			if bodyFile != "" {
+				content, err := os.ReadFile(bodyFile)
+				if err != nil {
+					return fmt.Errorf("ファイル読み込みエラー: %w", err)
+				}
+				cfg.Body = string(content)
+			} else {
+				cfg.Body = body
+			}
+
+			// 設定を検証
+			if err := cfg.Validate(); err != nil {
+				return err
+			}
+
+			// リクエストを実行
+			r := runner.NewRunner(cfg)
+			result, err := r.Run(context.Background())
+			if err != nil {
+				return err
+			}
+
+			// 結果を出力
+			var formatter output.Formatter
+			if cfg.OutputJSON {
+				formatter = output.NewJSONFormatter(os.Stdout)
+			} else {
+				formatter = output.NewTextFormatter(os.Stdout)
+			}
+
+			return formatter.Format(result)
 		},
 	}
 
