@@ -19,7 +19,7 @@ go.work
 go.work.sum
 
 # Build output
-conreq
+/conreq
 
 # IDE specific files
 .idea/

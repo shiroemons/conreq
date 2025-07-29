@@ -26,7 +26,7 @@ conreqは、同一のAPIエンドポイントに対して複数の並行HTTPリ�
 ### Go 1.24以降がインストールされている場合
 
 ```bash
-go install github.com/shiroemons/conreq/cmd@latest
+go install github.com/shiroemons/conreq/cmd/conreq@latest
 ```
 
 ### ソースからビルド
@@ -34,7 +34,7 @@ go install github.com/shiroemons/conreq/cmd@latest
 ```bash
 git clone https://github.com/shiroemons/conreq.git
 cd conreq
-go build -o conreq cmd/main.go
+go build -o conreq cmd/conreq/main.go
 ```
 
 ## 使い方
@@ -192,7 +192,7 @@ conreq https://api.example.com/idempotent -c 3 --request-id "fixed-request-id"
 ### ビルド
 
 ```bash
-go build -o conreq cmd/main.go
+go build -o conreq cmd/conreq/main.go
 ```
 
 ### テスト
@@ -206,7 +206,8 @@ go test ./...
 ```
 conreq/
 ├── cmd/
-│   └── main.go          # CLIエントリーポイント
+│   └── conreq/
+│       └── main.go      # CLIエントリーポイント
 ├── internal/
 │   ├── client/          # HTTPクライアント実装
 │   ├── config/          # 設定管理
