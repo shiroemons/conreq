@@ -22,20 +22,20 @@ var (
 
 func init() {
 	if info, ok := debug.ReadBuildInfo(); ok {
-		if version == "dev" {
+		if version == "dev" && info.Main.Version != "" {
 			version = info.Main.Version
 		}
 		for _, setting := range info.Settings {
 			switch setting.Key {
 			case "vcs.revision":
-				if commit == "none" {
+				if commit == "none" && setting.Value != "" {
 					commit = setting.Value
 					if len(commit) > 7 {
 						commit = commit[:7]
 					}
 				}
 			case "vcs.time":
-				if date == "unknown" {
+				if date == "unknown" && setting.Value != "" {
 					date = setting.Value
 				}
 			}
@@ -75,7 +75,15 @@ APIの挙動を検証するためのツールです。`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if showVersion {
-				fmt.Printf("conreq version %s (commit: %s, built at: %s)\n", version, commit, date)
+				versionStr := fmt.Sprintf("conreq version %s", version)
+				if commit != "none" {
+					versionStr += fmt.Sprintf(" (commit: %s", commit)
+					if date != "unknown" {
+						versionStr += fmt.Sprintf(", built at: %s", date)
+					}
+					versionStr += ")"
+				}
+				fmt.Println(versionStr)
 				return nil
 			}
 
