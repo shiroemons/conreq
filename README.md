@@ -70,19 +70,31 @@ go build -o conreq cmd/conreq/main.go
 
 ```bash
 # 単一のGETリクエスト
-conreq https://api.example.com/endpoint
+conreq https://httpbin.org/get
 
 # 3つの並行GETリクエスト
-conreq https://api.example.com/endpoint -c 3
+conreq https://httpbin.org/get -c 3
 
 # POSTリクエストでJSONボディを送信
-conreq https://api.example.com/endpoint -X POST -d '{"key": "value"}' -H "Content-Type: application/json"
+conreq https://httpbin.org/post -X POST -d '{"key": "value"}' -H "Content-Type: application/json"
 
 # ファイルからボディを読み込んでPOSTリクエスト
-conreq https://api.example.com/endpoint -X POST -d @request_body.json -H "Content-Type: application/json"
+conreq https://httpbin.org/post -X POST -d @request_body.json -H "Content-Type: application/json"
 
 # 同一Request IDで複数リクエストを送信
-conreq https://api.example.com/endpoint -c 3 --same-request-id
+conreq https://httpbin.org/anything -c 3 --same-request-id
+
+# カスタムヘッダーで認証
+conreq https://httpbin.org/bearer -H "Authorization: Bearer YOUR_TOKEN"
+
+# PUTリクエストでデータ更新
+conreq https://httpbin.org/put -X PUT -d '{"name": "updated"}' -H "Content-Type: application/json"
+
+# DELETEリクエスト
+conreq https://httpbin.org/delete -X DELETE
+
+# ステータスコードのテスト
+conreq https://httpbin.org/status/500 -c 3
 ```
 
 ### コマンドラインオプション
@@ -193,21 +205,56 @@ Average Response Time: 122ms
 
 ```bash
 # 5つの並行リクエストで負荷をかける
-conreq https://api.example.com/heavy-endpoint -c 5 --timeout 60s
+conreq https://httpbin.org/delay/1 -c 5 --timeout 60s
+
+# 大きなレスポンスを並行取得
+conreq https://httpbin.org/bytes/10240 -c 3
 ```
 
 ### レート制限の検証
 
 ```bash
 # 100ms間隔で5つのリクエストを送信
-conreq https://api.example.com/rate-limited -c 5 --delay 100ms
+conreq https://httpbin.org/anything -c 5 --delay 100ms
+
+# カスタムレスポンスヘッダーを設定
+conreq "https://httpbin.org/response-headers?X-RateLimit-Limit=10&X-RateLimit-Remaining=5" -c 3
 ```
 
 ### 冪等性の確認
 
 ```bash
 # 同じX-Request-IDで複数のリクエストを送信
-conreq https://api.example.com/idempotent -c 3 --request-id "fixed-request-id"
+conreq https://httpbin.org/anything -c 3 --request-id "fixed-request-id"
+
+# 同一Request IDで全リクエストを送信
+conreq https://httpbin.org/uuid -c 3 --same-request-id
+```
+
+### 認証のテスト
+
+```bash
+# Basic認証
+conreq https://httpbin.org/basic-auth/user/pass -H "Authorization: Basic dXNlcjpwYXNz"
+
+# Bearer Token認証
+conreq https://httpbin.org/bearer -H "Authorization: Bearer YOUR_TOKEN"
+
+# APIキー認証
+conreq https://httpbin.org/anything -H "X-API-Key: YOUR_API_KEY"
+```
+
+### エラーハンドリングの検証
+
+```bash
+# 特定のステータスコードをテスト
+conreq https://httpbin.org/status/503 -c 5
+
+# ランダムなステータスコード (200, 201, 400, 500のいずれかを返す)
+conreq "https://httpbin.org/status/200,201,400,500" -c 5
+
+# タイムアウトのテスト
+conreq https://httpbin.org/delay/10 --timeout 3s
 ```
 
 ## 開発
