@@ -53,6 +53,7 @@ brews:
   - repository:
       owner: shiroemons
       name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     folder: Formula
     homepage: "https://github.com/shiroemons/conreq"
     description: "CLI tool to send concurrent HTTP requests for API behavior verification"
