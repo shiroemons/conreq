@@ -53,3 +53,27 @@ docker-build: ## Build Docker image
 
 .PHONY: all
 all: clean deps fmt lint test build ## Run all tasks
+
+.PHONY: setup-git-hooks
+setup-git-hooks: ## Setup git hooks for the project
+	@scripts/setup-git-hooks.sh
+
+.PHONY: pre-push
+pre-push: ## Run all checks that would be run by pre-push hook
+	@echo "📝 Checking code formatting..."
+	@if ! go fmt ./... | grep -q .; then \
+		echo "✓ Code formatting check passed"; \
+	else \
+		echo "✗ Code needs formatting"; \
+		echo "Run 'go fmt ./...' to fix formatting issues"; \
+		exit 1; \
+	fi
+	@echo "🔍 Running go vet..."
+	@go vet ./...
+	@echo "✓ go vet passed"
+	@echo "🔍 Running golangci-lint..."
+	@docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v2.3.0 golangci-lint run
+	@echo "✓ golangci-lint passed"
+	@echo "🧪 Running tests..."
+	@go test ./...
+	@echo "✅ All pre-push checks passed!"

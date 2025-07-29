@@ -316,6 +316,24 @@ go build -o conreq cmd/conreq/main.go
 go test ./...
 ```
 
+### Git Hooks
+
+開発時の品質を保つため、pre-pushフックを設定することを推奨します：
+
+```bash
+# Git hooksのセットアップ
+make setup-git-hooks
+
+# または手動でpre-pushチェックを実行
+make pre-push
+```
+
+pre-pushフックは以下のチェックを行います：
+- `go fmt` - コードフォーマットのチェック
+- `go vet` - Goの静的解析
+- `golangci-lint` - 包括的なlintチェック
+- `go test` - 全テストの実行
+
 ### プロジェクト構造
 
 ```
