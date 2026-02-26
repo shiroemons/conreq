@@ -47,7 +47,7 @@ jobs:
         ./${{ matrix.output }} --version
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: conreq-${{ matrix.os }}
         path: ${{ matrix.output }}
@@ -80,7 +80,7 @@ jobs:
         GOOS=windows GOARCH=arm64 go build -ldflags="-s -w" -o conreq-windows-arm64.exe cmd/conreq/main.go
 
     - name: Upload cross-compiled binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: conreq-all-platforms
         path: conreq-*
